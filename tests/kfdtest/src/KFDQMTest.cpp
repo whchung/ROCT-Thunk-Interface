@@ -1168,30 +1168,33 @@ void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pSrcBuf, vo
 //     TEST_END
 // }
 
-TEST_F(KFDQMTest, CustomSGPRDispatch) {
-    TEST_START(TESTPROFILE_RUNALL);
-
-    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
-    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
-
-    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
-    HsaMemoryBuffer srcBuffer(PAGE_SIZE, defaultGPUNode, false);
-    HsaMemoryBuffer destBuffer(PAGE_SIZE, defaultGPUNode);
-
-    srcBuffer.Fill(0xDEADBEEF);
-    destBuffer.Fill(0x0A3D0A3D);
-
-    m_pIsaGen->GetCustomSGPRIsa(isaBuffer);
-
-    SyncDispatch(isaBuffer, srcBuffer.As<void*>(), destBuffer.As<void*>());
-
-    EXPECT_EQ(destBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
-
-    TEST_END
-}
+// TEST_F(KFDQMTest, CustomSGPRDispatch) {
+//     TEST_START(TESTPROFILE_RUNALL);
+// 
+//     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+//     ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+// 
+//     HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+//     HsaMemoryBuffer srcBuffer(PAGE_SIZE, defaultGPUNode, false);
+//     HsaMemoryBuffer destBuffer(PAGE_SIZE, defaultGPUNode);
+// 
+//     srcBuffer.Fill(0xDEADBEEF);
+//     destBuffer.Fill(0x0A3D0A3D);
+// 
+//     m_pIsaGen->GetCustomSGPRIsa(isaBuffer);
+// 
+//     SyncDispatch(isaBuffer, srcBuffer.As<void*>(), destBuffer.As<void*>());
+// 
+//     EXPECT_EQ(destBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+// 
+//     TEST_END
+// }
 
 void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node) {
     PM4Queue queue;
+    HsaClockCounters *ts;
+    HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters), PAGE_SIZE), 0);
+    ts = buf.As<HsaClockCounters*>();
 
     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
     if (node != -1)
@@ -1200,14 +1203,26 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
 
     Dispatch dispatch(isaBuffer);
-    dispatch.SetArgs(pMatrixABuf, pMatrixBBuf, pMatrixCBuf);
+    dispatch.SetArgs(pMatrixCBuf, pMatrixABuf, pMatrixBBuf);
     // Fix M/N/K be 1/1/1.
-    dispatch.SetDim(1, 1, 1);
+    dispatch.SetDim(40, 1, 4);
 
     ASSERT_SUCCESS(queue.Create(defaultGPUNode));
 
+    // warm-up
     dispatch.Submit(queue);
     dispatch.Sync();
+
+    for (int iter = 0; iter < 10; ++iter) {
+      hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+      HSAint64 begin = ts[0].GPUClockCounter;
+      dispatch.Submit(queue);
+      dispatch.Sync();
+      hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+      HSAint64 end = ts[0].GPUClockCounter;
+      HSAint64 latency = end - begin;
+      LOG() << "Latency(ns): " << std::dec << CounterToNanoSec(latency) << std::endl;
+    }
 
     EXPECT_SUCCESS(queue.Destroy());
 }
@@ -1219,9 +1234,21 @@ TEST_F(KFDQMTest, GEMMDispatch) {
     ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
 
     HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
-    HsaMemoryBuffer matrixABuffer(PAGE_SIZE, defaultGPUNode, false);
-    HsaMemoryBuffer matrixBBuffer(PAGE_SIZE, defaultGPUNode, false);
-    HsaMemoryBuffer matrixCBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    // M=16
+    // N=5120
+    // K=384
+    // sizeof(A) = M * K * sizeof(half)
+    // sizeof(B) = K * N * sizeof(half)
+    // sizeof(C) = M * N * sizeof(half)
+    const int M = 16;
+    const int N = 5120;
+    const int K = 384;
+    constexpr int sizeofA = M * K * 2;
+    constexpr int sizeofB = K * N * 2;
+    constexpr int sizeofC = M * N * 2;
+    HsaMemoryBuffer matrixABuffer(sizeofA, defaultGPUNode, false);
+    HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
+    HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
     matrixABuffer.Fill(0xDEADBEEF);
     matrixBBuffer.Fill(0x0A3D0A3D);
@@ -1230,7 +1257,7 @@ TEST_F(KFDQMTest, GEMMDispatch) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>());
 
-    EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+    //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
 
     TEST_END
 }
