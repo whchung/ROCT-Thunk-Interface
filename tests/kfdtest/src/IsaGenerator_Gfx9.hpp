@@ -34,6 +34,8 @@ class IsaGenerator_Gfx9 : public IsaGenerator {
     virtual void GetInfiniteLoopIsa(HsaMemoryBuffer& rBuf);
     virtual void GetAtomicIncIsa(HsaMemoryBuffer& rBuf);
 
+    virtual void GetCustomSGPRIsa(HsaMemoryBuffer& rBuf);
+
  protected:
     virtual const std::string& GetAsicName();
 
@@ -44,6 +46,8 @@ class IsaGenerator_Gfx9 : public IsaGenerator {
     static const uint32_t COPY_DWORD_ISA[];
     static const uint32_t INFINITE_LOOP_ISA[];
     static const uint32_t ATOMIC_ADD_ISA[];
+
+    static const uint32_t CUSTOM_SGPR_ISA[];
 };
 
 #endif  // _ISAGENERATOR_GFX9_H_

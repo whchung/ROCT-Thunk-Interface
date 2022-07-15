@@ -91,6 +91,15 @@ const uint32_t IsaGenerator_Gfx9::ATOMIC_ADD_ISA[] = {
     0xbf810000, 0x00000000
 };
 
+
+const uint32_t IsaGenerator_Gfx9::CUSTOM_SGPR_ISA[] = {
+    0x7e040202,               // v_mov_b32 v2, s2
+    0x7e060203,               // v_mov_b32 v3, s3
+    0x7e08020f,               // v_mov_b32 v4, s15. s15 would be 0xCAFEBABE.
+    0xdc730000, 0x007f0402,   // flat_store_dword v[2:3], v4 slc glc
+    0xbf810000                // s_endpgm
+};
+
 void IsaGenerator_Gfx9::GetNoopIsa(HsaMemoryBuffer& rBuf) {
     std::copy(NOOP_ISA, NOOP_ISA+ARRAY_SIZE(NOOP_ISA), rBuf.As<uint32_t*>());
 }
@@ -105,6 +114,10 @@ void IsaGenerator_Gfx9::GetInfiniteLoopIsa(HsaMemoryBuffer& rBuf) {
 
 void IsaGenerator_Gfx9::GetAtomicIncIsa(HsaMemoryBuffer& rBuf) {
     std::copy(ATOMIC_ADD_ISA, ATOMIC_ADD_ISA+ARRAY_SIZE(ATOMIC_ADD_ISA), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetCustomSGPRIsa(HsaMemoryBuffer& rBuf) {
+    std::copy(CUSTOM_SGPR_ISA, CUSTOM_SGPR_ISA+ARRAY_SIZE(CUSTOM_SGPR_ISA), rBuf.As<uint32_t*>());
 }
 
 const std::string& IsaGenerator_Gfx9::GetAsicName() {

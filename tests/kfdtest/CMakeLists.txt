@@ -130,28 +130,29 @@ set (SRC_FILES gtest-1.6.0/gtest-all.cpp
   src/KFDTestUtil.cpp
   src/KFDTestUtilQueue.cpp
 
-  src/KFDOpenCloseKFDTest.cpp
-  src/KFDTopologyTest.cpp
-  src/KFDMemoryTest.cpp
-  src/KFDLocalMemoryTest.cpp
-  src/KFDEventTest.cpp
+  #src/KFDOpenCloseKFDTest.cpp
+  #src/KFDTopologyTest.cpp
+  #src/KFDMemoryTest.cpp
+  #src/KFDLocalMemoryTest.cpp
+  #src/KFDEventTest.cpp
   src/KFDQMTest.cpp
-  src/KFDCWSRTest.cpp
-  src/KFDExceptionTest.cpp
-  src/KFDGraphicsInterop.cpp
-  src/KFDPerfCounters.cpp
-  src/KFDDBGTest.cpp
-  src/KFDGWSTest.cpp
-  src/KFDIPCTest.cpp
+  #src/KFDCWSRTest.cpp
+  #src/KFDExceptionTest.cpp
+  #src/KFDGraphicsInterop.cpp
+  #src/KFDPerfCounters.cpp
+  #src/KFDDBGTest.cpp
+  #src/KFDGWSTest.cpp
+  #src/KFDIPCTest.cpp
 
-  src/KFDEvictTest.cpp
-  src/KFDHWSTest.cpp
-  src/KFDPerformanceTest.cpp
-  src/KFDPMTest.cpp
-  src/KFDSVMRangeTest.cpp
-  src/KFDSVMEvictTest.cpp
-  src/KFDRASTest.cpp
-  src/RDMATest.cpp)
+  #src/KFDEvictTest.cpp
+  #src/KFDHWSTest.cpp
+  #src/KFDPerformanceTest.cpp
+  #src/KFDPMTest.cpp
+  #src/KFDSVMRangeTest.cpp
+  #src/KFDSVMEvictTest.cpp
+  #src/KFDRASTest.cpp
+  #src/RDMATest.cpp)
+  )
 
 message( STATUS "PROJECT_SOURCE_DIR:" ${PROJECT_SOURCE_DIR} )
 #message( STATUS "SRC_FILES: ")

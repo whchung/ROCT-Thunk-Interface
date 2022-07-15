@@ -125,7 +125,7 @@ void Dispatch::BuildIb() {
     unsigned int pgmRsrc2 = 0;
     pgmRsrc2 |= (m_ScratchEn << COMPUTE_PGM_RSRC2__SCRATCH_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__SCRATCH_EN_MASK;
-    pgmRsrc2 |= ((m_scratch_base ? 6 : 4) << COMPUTE_PGM_RSRC2__USER_SGPR__SHIFT)
+    pgmRsrc2 |= /*((m_scratch_base ? 6 : 4)*/ (16 << COMPUTE_PGM_RSRC2__USER_SGPR__SHIFT)
             & COMPUTE_PGM_RSRC2__USER_SGPR_MASK;
     pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TRAP_PRESENT__SHIFT)
             & COMPUTE_PGM_RSRC2__TRAP_PRESENT_MASK;
@@ -199,7 +199,7 @@ void Dispatch::BuildIb() {
         0,      // COMPUTE_USER_DATA_12 -                - unused
         0,      // COMPUTE_USER_DATA_13 -                - unused
         0,      // COMPUTE_USER_DATA_14 -                - unused
-        0,      // COMPUTE_USER_DATA_15 -                - unused
+        0xCAFEBABE,      // COMPUTE_USER_DATA_15 -                - unused
     };
 
     const unsigned int DISPATCH_INIT_VALUE = 0x00000021 | (is_dgpu() ? 0 : 0x1000) |
