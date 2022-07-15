@@ -91,7 +91,6 @@ const uint32_t IsaGenerator_Gfx9::ATOMIC_ADD_ISA[] = {
     0xbf810000, 0x00000000
 };
 
-
 const uint32_t IsaGenerator_Gfx9::CUSTOM_SGPR_ISA[] = {
     0x7e040202,               // v_mov_b32 v2, s2
     0x7e060203,               // v_mov_b32 v3, s3
