@@ -33,6 +33,7 @@ class Dispatch {
     ~Dispatch();
 
     void SetArgs(void* pArg1, void* pArg2);
+    void SetArgs(void* pArg1, void* pArg2, void* pArg3);
 
     void SetDim(unsigned int x, unsigned int y, unsigned int z);
 
@@ -62,6 +63,7 @@ class Dispatch {
 
     void* m_pArg1;
     void* m_pArg2;
+    void* m_pArg3;
 
     HsaEvent* m_pEop;
 

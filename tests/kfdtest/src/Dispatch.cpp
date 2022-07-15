@@ -34,7 +34,7 @@
 
 Dispatch::Dispatch(const HsaMemoryBuffer& isaBuf, const bool eventAutoReset)
     :m_IsaBuf(isaBuf), m_IndirectBuf(PACKETTYPE_PM4, PAGE_SIZE / sizeof(unsigned int), isaBuf.Node()),
-    m_DimX(1), m_DimY(1), m_DimZ(1), m_pArg1(NULL), m_pArg2(NULL), m_pEop(NULL), m_ScratchEn(false),
+    m_DimX(1), m_DimY(1), m_DimZ(1), m_pArg1(NULL), m_pArg2(NULL), m_pArg3(NULL), m_pEop(NULL), m_ScratchEn(false),
     m_ComputeTmpringSize(0), m_scratch_base(0ll), m_SpiPriority(0) {
     HsaEventDescriptor eventDesc;
     eventDesc.EventType = HSA_EVENTTYPE_SIGNAL;
@@ -55,6 +55,12 @@ Dispatch::~Dispatch() {
 void Dispatch::SetArgs(void* pArg1, void* pArg2) {
     m_pArg1 = pArg1;
     m_pArg2 = pArg2;
+}
+
+void Dispatch::SetArgs(void* pArg1, void* pArg2, void* pArg3) {
+    m_pArg1 = pArg1;
+    m_pArg2 = pArg2;
+    m_pArg3 = pArg3;
 }
 
 void Dispatch::SetDim(unsigned int x, unsigned int y, unsigned int z) {
@@ -106,9 +112,10 @@ int Dispatch::SyncWithStatus(unsigned int timeout) {
 
 void Dispatch::BuildIb() {
     HSAuint64 shiftedIsaAddr = m_IsaBuf.As<uint64_t>() >> 8;
-    unsigned int arg0, arg1, arg2, arg3;
+    unsigned int arg0, arg1, arg2, arg3, arg4, arg5;
     SplitU64(reinterpret_cast<uint64_t>(m_pArg1), arg0, arg1);
     SplitU64(reinterpret_cast<uint64_t>(m_pArg2), arg2, arg3);
+    SplitU64(reinterpret_cast<uint64_t>(m_pArg3), arg4, arg5);
 
     // Starts at COMPUTE_START_X
     const unsigned int COMPUTE_DISPATCH_DIMS_VALUES[] = {
@@ -188,8 +195,8 @@ void Dispatch::BuildIb() {
         arg1,   // COMPUTE_USER_DATA_1  - arg1           - resource descriptor for the scratch buffer - 2nd dword
         arg2,   // COMPUTE_USER_DATA_2  - arg2           - resource descriptor for the scratch buffer - 3rd dword
         arg3,   // COMPUTE_USER_DATA_3  - arg3           - resource descriptor for the scratch buffer - 4th dword
-        static_cast<uint32_t>(m_scratch_base),  // COMPUTE_USER_DATA_4  - flat_scratch_lo
-        static_cast<uint32_t>(m_scratch_base >> 32),  // COMPUTE_USER_DATA_4  - flat_scratch_hi
+        arg4, //static_cast<uint32_t>(m_scratch_base),  // COMPUTE_USER_DATA_4  - flat_scratch_lo
+        arg5, //static_cast<uint32_t>(m_scratch_base >> 32),  // COMPUTE_USER_DATA_4  - flat_scratch_hi
         0,      // COMPUTE_USER_DATA_6  -                - AQL queue address, low part
         0,      // COMPUTE_USER_DATA_7  -                - AQL queue address, high part
         0,      // COMPUTE_USER_DATA_8  -                - kernel arguments block, low part
