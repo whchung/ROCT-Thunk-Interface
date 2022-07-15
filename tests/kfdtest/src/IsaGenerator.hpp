@@ -41,6 +41,7 @@ class IsaGenerator {
     virtual void GetAwTrapHandler(HsaMemoryBuffer& rBuf);
 
     virtual void GetCustomSGPRIsa(HsaMemoryBuffer& rBuf) {}
+    virtual void GetGEMMIsa(HsaMemoryBuffer& rBuf) {}
 
     void CompileShader(const char* shaderCode, const char* shaderName, HsaMemoryBuffer& rBuf);
 

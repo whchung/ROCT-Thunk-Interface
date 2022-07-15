@@ -35,6 +35,7 @@ class IsaGenerator_Aldbrn : public IsaGenerator {
     virtual void GetAtomicIncIsa(HsaMemoryBuffer& rBuf);
 
     virtual void GetCustomSGPRIsa(HsaMemoryBuffer& rBuf);
+    virtual void GetGEMMIsa(HsaMemoryBuffer& rBuf);
 
  protected:
     virtual const std::string& GetAsicName();
@@ -48,6 +49,7 @@ class IsaGenerator_Aldbrn : public IsaGenerator {
     static const uint32_t ATOMIC_ADD_ISA[];
 
     static const uint32_t CUSTOM_SGPR_ISA[];
+    static const uint32_t GEMM_ISA[];
 };
 
 #endif  // _ISAGENERATOR_ALDEBARAN_H_

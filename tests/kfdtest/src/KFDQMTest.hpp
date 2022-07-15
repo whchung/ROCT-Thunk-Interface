@@ -42,6 +42,7 @@ class KFDQMTest : public KFDBaseComponentTest {
     virtual void TearDown();
 
     void SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pSrcBuf, void* pDstBuf, int node = -1);
+    void SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node = -1);
     HSAint64 TimeConsumedwithCUMask(int node, uint32_t *mask, uint32_t mask_count);
     HSAint64 GetAverageTimeConsumedwithCUMask(int node, uint32_t *mask, uint32_t mask_count, int iterations);
  protected:  // Members

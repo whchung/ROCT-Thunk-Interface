@@ -99,6 +99,14 @@ const uint32_t IsaGenerator_Aldbrn::CUSTOM_SGPR_ISA[] = {
     0xbf810000                // s_endpgm
 };
 
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
+    0x7e040204,               // v_mov_b32 v2, s4
+    0x7e060205,               // v_mov_b32 v3, s5
+    0x7e08020f,               // v_mov_b32 v4, s15. s15 would be 0xCAFEBABE.
+    0xdc730000, 0x007f0402,   // flat_store_dword v[2:3], v4 slc glc
+    0xbf810000                // s_endpgm
+};
+
 void IsaGenerator_Aldbrn::GetNoopIsa(HsaMemoryBuffer& rBuf) {
     std::copy(NOOP_ISA, NOOP_ISA+ARRAY_SIZE(NOOP_ISA), rBuf.As<uint32_t*>());
 }
@@ -117,6 +125,10 @@ void IsaGenerator_Aldbrn::GetAtomicIncIsa(HsaMemoryBuffer& rBuf) {
 
 void IsaGenerator_Aldbrn::GetCustomSGPRIsa(HsaMemoryBuffer& rBuf) {
     std::copy(CUSTOM_SGPR_ISA, CUSTOM_SGPR_ISA+ARRAY_SIZE(CUSTOM_SGPR_ISA), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA, GEMM_ISA+ARRAY_SIZE(GEMM_ISA), rBuf.As<uint32_t*>());
 }
 
 const std::string& IsaGenerator_Aldbrn::GetAsicName() {
