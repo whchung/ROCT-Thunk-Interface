@@ -1213,16 +1213,21 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     dispatch.Submit(queue);
     dispatch.Sync();
 
-    for (int iter = 0; iter < 10; ++iter) {
+    const int ITERATION = 10;
+    HSAint64 latency_total = 0;
+    HSAint64 begin, end, latency;
+    for (int iter = 0; iter < ITERATION; ++iter) {
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
-      HSAint64 begin = ts[0].GPUClockCounter;
+      begin = ts[0].GPUClockCounter;
       dispatch.Submit(queue);
       dispatch.Sync();
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
-      HSAint64 end = ts[0].GPUClockCounter;
-      HSAint64 latency = end - begin;
+      end = ts[0].GPUClockCounter;
+      latency = end - begin;
       LOG() << "Latency(ns): " << std::dec << CounterToNanoSec(latency) << std::endl;
+      latency_total += latency;
     }
+    LOG() << "Avg latency(ns): " << std::dec << (CounterToNanoSec(latency_total) / ITERATION) << std::endl;
 
     EXPECT_SUCCESS(queue.Destroy());
 }
