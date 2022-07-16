@@ -133,6 +133,9 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
 // s0-s1: matrix C pointer
 // s2-s3: matrix A pointer
 // s4-s5: matrix B pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
  // 0xC00A0402, 0x00000000, //	s_load_dwordx4 s[16:19], s[4:5], 0x0                       
  // 0xC00A0002, 0x00000010, //	s_load_dwordx4 s[0:3], s[4:5], 0x10                        
