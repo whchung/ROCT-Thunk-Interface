@@ -99,14 +99,6 @@ const uint32_t IsaGenerator_Gfx9::CUSTOM_SGPR_ISA[] = {
     0xbf810000                // s_endpgm
 };
 
-const uint32_t IsaGenerator_Gfx9::GEMM_ISA[] = {
-    0x7e040204,               // v_mov_b32 v2, s4
-    0x7e060205,               // v_mov_b32 v3, s5
-    0x7e08020f,               // v_mov_b32 v4, s15. s15 would be 0xCAFEBABE.
-    0xdc730000, 0x007f0402,   // flat_store_dword v[2:3], v4 slc glc
-    0xbf810000                // s_endpgm
-};
-
 void IsaGenerator_Gfx9::GetNoopIsa(HsaMemoryBuffer& rBuf) {
     std::copy(NOOP_ISA, NOOP_ISA+ARRAY_SIZE(NOOP_ISA), rBuf.As<uint32_t*>());
 }
@@ -127,11 +119,38 @@ void IsaGenerator_Gfx9::GetCustomSGPRIsa(HsaMemoryBuffer& rBuf) {
     std::copy(CUSTOM_SGPR_ISA, CUSTOM_SGPR_ISA+ARRAY_SIZE(CUSTOM_SGPR_ISA), rBuf.As<uint32_t*>());
 }
 
-void IsaGenerator_Gfx9::GetGEMMIsa(HsaMemoryBuffer& rBuf) {
-    std::copy(GEMM_ISA, GEMM_ISA+ARRAY_SIZE(GEMM_ISA), rBuf.As<uint32_t*>());
-}
-
 const std::string& IsaGenerator_Gfx9::GetAsicName() {
     return ASIC_NAME;
 }
 
+const uint32_t IsaGenerator_Gfx9::GEMM_ISA_16_1152_5120[] = {
+      0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Gfx9::GEMM_ISA_16_5120_384[] = {
+      0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Gfx9::GEMM_ISA_16_1280_5120[] = {
+      0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Gfx9::GEMM_ISA_16_5120_1280[] = {
+      0xbf810000                // s_endpgm
+};
+
+void IsaGenerator_Gfx9::GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& rBuf) {
+      std::copy(GEMM_ISA_16_1152_5120, GEMM_ISA_16_1152_5120+ARRAY_SIZE(GEMM_ISA_16_1152_5120), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetGEMMIsa_16_5120_384(HsaMemoryBuffer& rBuf) {
+      std::copy(GEMM_ISA_16_5120_384, GEMM_ISA_16_5120_384+ARRAY_SIZE(GEMM_ISA_16_5120_384), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetGEMMIsa_16_1280_5120(HsaMemoryBuffer& rBuf) {
+      std::copy(GEMM_ISA_16_1280_5120, GEMM_ISA_16_1280_5120+ARRAY_SIZE(GEMM_ISA_16_1280_5120), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetGEMMIsa_16_5120_1280(HsaMemoryBuffer& rBuf) {
+      std::copy(GEMM_ISA_16_5120_1280, GEMM_ISA_16_5120_1280+ARRAY_SIZE(GEMM_ISA_16_5120_1280), rBuf.As<uint32_t*>());
+}

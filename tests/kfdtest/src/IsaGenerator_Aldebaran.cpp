@@ -123,6 +123,10 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
     return ASIC_NAME;
 }
 
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
+    0xbf810000                // s_endpgm
+};
+
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x
@@ -136,7 +140,7 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
 // s6 : workgroup_id_x
 // s7 : workgroup_id_y
 // s8 : workgroup_id_z
-const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
  // 0xC00A0402, 0x00000000, //	s_load_dwordx4 s[16:19], s[4:5], 0x0                       
  // 0xC00A0002, 0x00000010, //	s_load_dwordx4 s[0:3], s[4:5], 0x10                        
  // 0xBF8CC07F,             //	s_waitcnt lgkmcnt(0)                                       
@@ -396,6 +400,26 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
  0xBF810000              //	s_endpgm                                                   
 };
 
-void IsaGenerator_Aldbrn::GetGEMMIsa(HsaMemoryBuffer& rBuf) {
-    std::copy(GEMM_ISA, GEMM_ISA+ARRAY_SIZE(GEMM_ISA), rBuf.As<uint32_t*>());
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
+    0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
+    0xbf810000                // s_endpgm
+};
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_1152_5120, GEMM_ISA_16_1152_5120+ARRAY_SIZE(GEMM_ISA_16_1152_5120), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_5120_384(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_5120_384, GEMM_ISA_16_5120_384+ARRAY_SIZE(GEMM_ISA_16_5120_384), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_1280_5120(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_1280_5120, GEMM_ISA_16_1280_5120+ARRAY_SIZE(GEMM_ISA_16_1280_5120), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_5120_1280(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_5120_1280, GEMM_ISA_16_5120_1280+ARRAY_SIZE(GEMM_ISA_16_5120_1280), rBuf.As<uint32_t*>());
 }
