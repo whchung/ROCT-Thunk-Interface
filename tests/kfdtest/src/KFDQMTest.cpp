@@ -1294,7 +1294,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40, 1, 4);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40, 1, 4);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
 
