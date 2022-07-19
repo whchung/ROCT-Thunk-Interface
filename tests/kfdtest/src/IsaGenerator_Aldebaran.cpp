@@ -123,8 +123,11 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
     return ASIC_NAME;
 }
 
-// Github copilot GEMM ISA M=16/N=5120/K=384.
-const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
+    0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
  // Original ISA:
  // s4-s5 : kernarg pointer
  // s6 : workgroup_id_x
@@ -397,6 +400,26 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
  0xBF810000              //	s_endpgm                                                   
 };
 
-void IsaGenerator_Aldbrn::GetGEMMIsa(HsaMemoryBuffer& rBuf) {
-    std::copy(GEMM_ISA, GEMM_ISA+ARRAY_SIZE(GEMM_ISA), rBuf.As<uint32_t*>());
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
+    0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
+    0xbf810000                // s_endpgm
+};
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_1152_5120, GEMM_ISA_16_1152_5120+ARRAY_SIZE(GEMM_ISA_16_1152_5120), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_5120_384(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_5120_384, GEMM_ISA_16_5120_384+ARRAY_SIZE(GEMM_ISA_16_5120_384), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_1280_5120(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_1280_5120, GEMM_ISA_16_1280_5120+ARRAY_SIZE(GEMM_ISA_16_1280_5120), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Aldbrn::GetGEMMIsa_16_5120_1280(HsaMemoryBuffer& rBuf) {
+    std::copy(GEMM_ISA_16_5120_1280, GEMM_ISA_16_5120_1280+ARRAY_SIZE(GEMM_ISA_16_5120_1280), rBuf.As<uint32_t*>());
 }
