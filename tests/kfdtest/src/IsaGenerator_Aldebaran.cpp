@@ -123,29 +123,30 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
     return ASIC_NAME;
 }
 
-// Original ISA:
-// s4-s5 : kernarg pointer
-// s6 : workgroup_id_x
-// s7 : workgroup_id_y
-// s8 : workgroup_id_z
-//
-// Hacked ISA:
-// s0-s1: matrix C pointer
-// s2-s3: matrix A pointer
-// s4-s5: matrix B pointer
-// s6 : workgroup_id_x
-// s7 : workgroup_id_y
-// s8 : workgroup_id_z
+// Github copilot GEMM ISA M=16/N=5120/K=384.
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA[] = {
+ // Original ISA:
+ // s4-s5 : kernarg pointer
+ // s6 : workgroup_id_x
+ // s7 : workgroup_id_y
+ // s8 : workgroup_id_z
  // 0xC00A0402, 0x00000000, //	s_load_dwordx4 s[16:19], s[4:5], 0x0                       
  // 0xC00A0002, 0x00000010, //	s_load_dwordx4 s[0:3], s[4:5], 0x10                        
  // 0xBF8CC07F,             //	s_waitcnt lgkmcnt(0)                                       
 
+ // Hacked ISA
+ // s0-s1: matrix C pointer
+ // s2-s3: matrix A pointer
+ // s4-s5: matrix B pointer
+ // s6 : workgroup_id_x
+ // s7 : workgroup_id_y
+ // s8 : workgroup_id_z
  0xBE900002,             //     s_mov_b32 s16, s2
  0xBE910003,             //     s_mov_b32 s17, s3
  0xBE920004,		 //     s_mov_b32 s18, s4
  0xBE930005,		 //     s_mov_b32_s19, s5
 
+ // The actual GEMM algorithm from  Microsoft based on CK.
  0x8E028407,             //	s_lshl_b32 s2, s7, 4                                       
  0x20300084,             //	v_lshrrev_b32_e32 v24, 4, v0                               
  0x68343002,             //	v_add_u32_e32 v26, s2, v24                                 
