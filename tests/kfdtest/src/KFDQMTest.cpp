@@ -1193,7 +1193,7 @@ void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pSrcBuf, vo
 void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z) {
     PM4Queue queue;
     HsaClockCounters *ts;
-    HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters), PAGE_SIZE), 0);
+    HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 2, PAGE_SIZE), 0);
     ts = buf.As<HsaClockCounters*>();
 
     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
@@ -1217,11 +1217,11 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     HSAint64 begin, end, latency;
     for (int iter = 0; iter < ITERATION; ++iter) {
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
-      begin = ts[0].GPUClockCounter;
       dispatch.Submit(queue);
       dispatch.Sync();
-      hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
-      end = ts[0].GPUClockCounter;
+      hsaKmtGetClockCounters(defaultGPUNode, &ts[1]);
+      begin = ts[0].GPUClockCounter;
+      end = ts[1].GPUClockCounter;
       latency = end - begin;
       LOG() << "Latency(ns): " << std::dec << CounterToNanoSec(latency) << std::endl;
       latency_total += latency;
