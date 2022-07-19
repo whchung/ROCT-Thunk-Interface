@@ -1204,7 +1204,7 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
 
     Dispatch dispatch(isaBuffer);
     dispatch.SetArgs(pMatrixCBuf, pMatrixABuf, pMatrixBBuf);
-    dispatch.SetDim(X, Y, Z);
+    dispatch.SetDim(X * 256, Y, Z);
 
     ASSERT_SUCCESS(queue.Create(defaultGPUNode));
 
