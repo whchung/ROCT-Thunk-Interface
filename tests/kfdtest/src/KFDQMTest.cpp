@@ -1204,7 +1204,7 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
 
     Dispatch dispatch(isaBuffer);
     dispatch.SetArgs(pMatrixCBuf, pMatrixABuf, pMatrixBBuf);
-    dispatch.SetDim(X * 256, Y, Z);
+    dispatch.SetDim(X, Y, Z);
 
     ASSERT_SUCCESS(queue.Create(defaultGPUNode));
 
@@ -1259,7 +1259,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9, 1, 8);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 8);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
 
@@ -1294,7 +1294,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40, 1, 4);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 4);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
 
@@ -1329,7 +1329,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
 
     m_pIsaGen->GetGEMMIsa_16_1280_5120(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10, 1, 8);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 8);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
 
@@ -1364,7 +1364,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
 
     m_pIsaGen->GetGEMMIsa_16_5120_1280(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40, 1, 8);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 8);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
 
