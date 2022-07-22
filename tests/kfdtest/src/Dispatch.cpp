@@ -122,7 +122,7 @@ void Dispatch::BuildIb() {
         0,      // START_X
         0,      // START_Y
         0,      // START_Z
-        256,    // NUM_THREADS_X - this is actually the number of threads in a thread group
+        64,    // NUM_THREADS_X - this is actually the number of threads in a thread group
         1,      // NUM_THREADS_Y
         1,      // NUM_THREADS_Z
         0,      // COMPUTE_PIPELINESTAT_ENABLE
@@ -130,25 +130,31 @@ void Dispatch::BuildIb() {
     };
 
     unsigned int pgmRsrc2 = 0;
-    pgmRsrc2 |= (m_ScratchEn << COMPUTE_PGM_RSRC2__SCRATCH_EN__SHIFT)
+    pgmRsrc2 |= (/*m_ScratchEn*/0 << COMPUTE_PGM_RSRC2__SCRATCH_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__SCRATCH_EN_MASK;
     pgmRsrc2 |= /*((m_scratch_base ? 6 : 4)*/ (16 << COMPUTE_PGM_RSRC2__USER_SGPR__SHIFT)
             & COMPUTE_PGM_RSRC2__USER_SGPR_MASK;
-    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TRAP_PRESENT__SHIFT)
+    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TRAP_PRESENT__SHIFT)
             & COMPUTE_PGM_RSRC2__TRAP_PRESENT_MASK;
     pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_X_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_X_EN_MASK;
-    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TIDIG_COMP_CNT__SHIFT)
+    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_Y_EN__SHIFT)
+            & COMPUTE_PGM_RSRC2__TGID_Y_EN_MASK;
+    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_Z_EN__SHIFT)
+            & COMPUTE_PGM_RSRC2__TGID_Z_EN_MASK;
+    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TG_SIZE_EN__SHIFT)
+            & COMPUTE_PGM_RSRC2__TG_SIZE_EN_MASK;
+    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TIDIG_COMP_CNT__SHIFT)
             & COMPUTE_PGM_RSRC2__TIDIG_COMP_CNT_MASK;
     pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__EXCP_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__EXCP_EN_MASK;
-    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__EXCP_EN_MSB__SHIFT)
+    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__EXCP_EN_MSB__SHIFT)
             & COMPUTE_PGM_RSRC2__EXCP_EN_MSB_MASK;
 
     const unsigned int COMPUTE_PGM_RSRC[] = {
-        // PGM_RSRC1 = { VGPRS: 16 SGPRS: 16 PRIORITY: m_SpiPriority FLOAT_MODE: c0 PRIV: 0
+        // PGM_RSRC1 = { VGPRS: 16 SGPRS: 32 PRIORITY: m_SpiPriority FLOAT_MODE: c0 PRIV: 0
         // DX10_CLAMP: 0 DEBUG_MODE: 0 IEEE_MODE: 0 BULKY: 0 CDBG_USER: 0 }
-        0x000c0084 | ((m_SpiPriority & 3) << 10),
+        0x000c0104 | ((m_SpiPriority & 3) << 10),
         pgmRsrc2
     };
 
@@ -243,6 +249,7 @@ void Dispatch::BuildIb() {
     m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_USER_DATA_0, COMPUTE_USER_DATA_VALUES,
                                                   ARRAY_SIZE(COMPUTE_USER_DATA_VALUES)));
 
+    LOG() << std::dec << "Dim: " << m_DimX << " " << m_DimY << " " << m_DimZ << std::hex << "\n";
     m_IndirectBuf.AddPacket(PM4DispatchDirectPacket(m_DimX, m_DimY, m_DimZ, DISPATCH_INIT_VALUE));
 
     // EVENT_WRITE.partial_flush causes problems with preemptions in
