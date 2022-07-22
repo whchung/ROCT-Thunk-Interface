@@ -38,6 +38,7 @@ class IsaGenerator_Gfx9 : public IsaGenerator {
     virtual void GetScalarSetIsa(HsaMemoryBuffer& rBuf);
     virtual void GetScalarAddIsa(HsaMemoryBuffer& rBuf);
     virtual void GetVectorSetIsa(HsaMemoryBuffer& rBuf);
+    virtual void GetVectorAddIsa(HsaMemoryBuffer& rBuf);
 
     virtual void GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& buf);
     virtual void GetGEMMIsa_16_5120_384(HsaMemoryBuffer& rBuf);
@@ -59,6 +60,7 @@ class IsaGenerator_Gfx9 : public IsaGenerator {
     static const uint32_t SCALAR_SET_ISA[];
     static const uint32_t SCALAR_ADD_ISA[];
     static const uint32_t VECTOR_SET_ISA[];
+    static const uint32_t VECTOR_ADD_ISA[];
 
     static const uint32_t GEMM_ISA_16_1152_5120[];
     static const uint32_t GEMM_ISA_16_5120_384[];

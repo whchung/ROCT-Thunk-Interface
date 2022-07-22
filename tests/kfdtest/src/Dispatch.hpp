@@ -36,6 +36,7 @@ class Dispatch {
     void SetArgs(void* pArg1, void* pArg2, void* pArg3);
 
     void SetDim(unsigned int x, unsigned int y, unsigned int z);
+    void SetBlock(unsigned int x, unsigned int y, unsigned int z);
 
     void Submit(BaseQueue& queue);
 
@@ -60,6 +61,10 @@ class Dispatch {
     unsigned int m_DimX;
     unsigned int m_DimY;
     unsigned int m_DimZ;
+
+    unsigned int m_BlockX;
+    unsigned int m_BlockY;
+    unsigned int m_BlockZ;
 
     void* m_pArg1;
     void* m_pArg2;

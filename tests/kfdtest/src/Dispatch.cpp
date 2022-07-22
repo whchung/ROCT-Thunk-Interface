@@ -34,7 +34,7 @@
 
 Dispatch::Dispatch(const HsaMemoryBuffer& isaBuf, const bool eventAutoReset)
     :m_IsaBuf(isaBuf), m_IndirectBuf(PACKETTYPE_PM4, PAGE_SIZE / sizeof(unsigned int), isaBuf.Node()),
-    m_DimX(1), m_DimY(1), m_DimZ(1), m_pArg1(NULL), m_pArg2(NULL), m_pArg3(NULL), m_pEop(NULL), m_ScratchEn(false),
+    m_DimX(1), m_DimY(1), m_DimZ(1), m_BlockX(1), m_BlockY(1), m_BlockZ(1), m_pArg1(NULL), m_pArg2(NULL), m_pArg3(NULL), m_pEop(NULL), m_ScratchEn(false),
     m_ComputeTmpringSize(0), m_scratch_base(0ll), m_SpiPriority(0) {
     HsaEventDescriptor eventDesc;
     eventDesc.EventType = HSA_EVENTTYPE_SIGNAL;
@@ -67,6 +67,12 @@ void Dispatch::SetDim(unsigned int x, unsigned int y, unsigned int z) {
     m_DimX = x;
     m_DimY = y;
     m_DimZ = z;
+}
+
+void Dispatch::SetBlock(unsigned int x, unsigned int y, unsigned int z) {
+    m_BlockX = x;
+    m_BlockY = y;
+    m_BlockZ = z;
 }
 
 void Dispatch::SetScratch(int numWaves, int waveSize, HSAuint64 scratch_base) {
@@ -118,16 +124,19 @@ void Dispatch::BuildIb() {
     SplitU64(reinterpret_cast<uint64_t>(m_pArg3), arg4, arg5);
 
     // Starts at COMPUTE_START_X
-    const unsigned int COMPUTE_DISPATCH_DIMS_VALUES[] = {
+    unsigned int COMPUTE_DISPATCH_DIMS_VALUES[] = {
         0,      // START_X
         0,      // START_Y
         0,      // START_Z
-        64,    // NUM_THREADS_X - this is actually the number of threads in a thread group
+        1,      // NUM_THREADS_X - this is actually the number of threads in a thread group
         1,      // NUM_THREADS_Y
         1,      // NUM_THREADS_Z
         0,      // COMPUTE_PIPELINESTAT_ENABLE
         0,      // COMPUTE_PERFCOUNT_ENABLE
     };
+    COMPUTE_DISPATCH_DIMS_VALUES[3] = m_BlockX;
+    COMPUTE_DISPATCH_DIMS_VALUES[4] = m_BlockY;
+    COMPUTE_DISPATCH_DIMS_VALUES[5] = m_BlockZ;
 
     unsigned int pgmRsrc2 = 0;
     pgmRsrc2 |= (/*m_ScratchEn*/0 << COMPUTE_PGM_RSRC2__SCRATCH_EN__SHIFT)
@@ -138,9 +147,9 @@ void Dispatch::BuildIb() {
             & COMPUTE_PGM_RSRC2__TRAP_PRESENT_MASK;
     pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_X_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_X_EN_MASK;
-    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_Y_EN__SHIFT)
+    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TGID_Y_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_Y_EN_MASK;
-    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_Z_EN__SHIFT)
+    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TGID_Z_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_Z_EN_MASK;
     pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TG_SIZE_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TG_SIZE_EN_MASK;

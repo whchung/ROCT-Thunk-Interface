@@ -1191,7 +1191,7 @@ TEST_F(KFDQMTest, CustomSGPRDispatch) {
     TEST_END
 }
 
-void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z) {
+void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z, int BlockX, int BlockY, int BlockZ) {
     PM4Queue queue;
 
     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
@@ -1203,6 +1203,7 @@ void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf
     Dispatch dispatch(isaBuffer);
     dispatch.SetArgs(pMatrixCBuf, pMatrixABuf, pMatrixBBuf);
     dispatch.SetDim(X, Y, Z);
+    dispatch.SetBlock(BlockX, BlockY, BlockZ);
 
     ASSERT_SUCCESS(queue.Create(defaultGPUNode));
 
@@ -1274,10 +1275,35 @@ TEST_F(KFDQMTest, VectorSet) {
 
     m_pIsaGen->GetVectorSetIsa(isaBuffer);
 
-    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 64, 1, 1);
+    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 64, 1, 1, 64, 1, 1);
 
     for (unsigned i = 0; i < 64; ++i) {
       EXPECT_EQ(vectorC.As<unsigned int*>()[i], i);
+    }
+
+    TEST_END
+}
+
+TEST_F(KFDQMTest, VectorAdd) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer vectorA(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorB(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorC(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+
+    vectorA.Fill(0x1);
+    vectorB.Fill(0x2);
+
+    m_pIsaGen->GetVectorAddIsa(isaBuffer);
+
+    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 64, 1, 1, 64, 1, 1);
+
+    for (unsigned i = 0; i < 64; ++i) {
+      EXPECT_EQ(vectorC.As<unsigned int*>()[i], 0x3);
     }
 
     TEST_END
