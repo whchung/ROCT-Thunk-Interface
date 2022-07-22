@@ -122,7 +122,7 @@ void Dispatch::BuildIb() {
         0,      // START_X
         0,      // START_Y
         0,      // START_Z
-        256,      // NUM_THREADS_X - this is actually the number of threads in a thread group
+        256,    // NUM_THREADS_X - this is actually the number of threads in a thread group
         1,      // NUM_THREADS_Y
         1,      // NUM_THREADS_Z
         0,      // COMPUTE_PIPELINESTAT_ENABLE

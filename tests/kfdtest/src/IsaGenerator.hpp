@@ -41,6 +41,8 @@ class IsaGenerator {
     virtual void GetAwTrapHandler(HsaMemoryBuffer& rBuf);
 
     virtual void GetCustomSGPRIsa(HsaMemoryBuffer& rBuf) {}
+    virtual void GetScalarSetIsa(HsaMemoryBuffer& rBuf) {}
+    virtual void GetScalarAddIsa(HsaMemoryBuffer& rBuf) {}
 
     virtual void GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& buf) {}
     virtual void GetGEMMIsa_16_5120_384(HsaMemoryBuffer& rBuf) {}

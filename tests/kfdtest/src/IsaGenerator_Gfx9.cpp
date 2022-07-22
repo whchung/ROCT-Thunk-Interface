@@ -99,6 +99,33 @@ const uint32_t IsaGenerator_Gfx9::CUSTOM_SGPR_ISA[] = {
     0xbf810000                // s_endpgm
 };
 
+const uint32_t IsaGenerator_Gfx9::SCALAR_SET_ISA[] = {
+    0x7e000200,               // v_mov_b32 v0, s0
+    0x7e020201,               // v_mov_b32 v1, s1
+    0x7e040202,               // v_mov_b32 v2, s2
+    0x7e060203,               // v_mov_b32 v3, s3
+    0xdc530000, 0x067f0002,   // flat_load_dword v6, v[2:3]
+    0xbf8c0000,               // s_waitcnt 0
+    0x680c0d06,               // v_add_u32 v6, v6, v6
+    0xdc730000, 0x007f0600,   // flat_store_dword v[0:1], v6 slc glc
+    0xbf810000                // s_endpgm
+};
+
+const uint32_t IsaGenerator_Gfx9::SCALAR_ADD_ISA[] = {
+    0x7e000200,               // v_mov_b32 v0, s0
+    0x7e020201,               // v_mov_b32 v1, s1
+    0x7e040202,               // v_mov_b32 v2, s2
+    0x7e060203,               // v_mov_b32 v3, s3
+    0x7e080204,               // v_mov_b32 v4, s4
+    0x7e0A0205,               // v_mov_b32 v5, s5
+    0xdc530000, 0x067f0002,   // flat_load_dword v6, v[2:3]
+    0xdc530000, 0x077f0004,   // flat_load_dword v7, v[4:5]
+    0xbf8c0000,               // s_waitcnt 0
+    0x680c0d07,               // v_add_u32 v6, v6, v7
+    0xdc730000, 0x007f0600,   // flat_store_dword v[0:1], v6 slc glc
+    0xbf810000                // s_endpgm
+};
+
 void IsaGenerator_Gfx9::GetNoopIsa(HsaMemoryBuffer& rBuf) {
     std::copy(NOOP_ISA, NOOP_ISA+ARRAY_SIZE(NOOP_ISA), rBuf.As<uint32_t*>());
 }
@@ -117,6 +144,14 @@ void IsaGenerator_Gfx9::GetAtomicIncIsa(HsaMemoryBuffer& rBuf) {
 
 void IsaGenerator_Gfx9::GetCustomSGPRIsa(HsaMemoryBuffer& rBuf) {
     std::copy(CUSTOM_SGPR_ISA, CUSTOM_SGPR_ISA+ARRAY_SIZE(CUSTOM_SGPR_ISA), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetScalarSetIsa(HsaMemoryBuffer& rBuf) {
+      std::copy(SCALAR_SET_ISA, SCALAR_SET_ISA+ARRAY_SIZE(SCALAR_SET_ISA), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetScalarAddIsa(HsaMemoryBuffer& rBuf) {
+      std::copy(SCALAR_ADD_ISA, SCALAR_ADD_ISA+ARRAY_SIZE(SCALAR_ADD_ISA), rBuf.As<uint32_t*>());
 }
 
 const std::string& IsaGenerator_Gfx9::GetAsicName() {
