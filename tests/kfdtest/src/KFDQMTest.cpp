@@ -1213,52 +1213,52 @@ void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf
     EXPECT_SUCCESS(queue.Destroy());
 }
 
-// TEST_F(KFDQMTest, ScalarSet) {
-//     TEST_START(TESTPROFILE_RUNALL);
-// 
-//     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
-//     ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
-// 
-//     HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
-//     HsaMemoryBuffer vectorA(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-//     HsaMemoryBuffer vectorB(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-//     HsaMemoryBuffer vectorC(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-// 
-//     vectorA.Fill(0x1);
-// 
-//     m_pIsaGen->GetScalarSetIsa(isaBuffer);
-// 
-//     SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 1, 1, 1);
-// 
-//     EXPECT_EQ(vectorC.As<unsigned int*>()[0], 0x2);
-//     EXPECT_EQ(vectorC.As<unsigned int*>()[1], 0x0);
-// 
-//     TEST_END
-// }
-// 
-// TEST_F(KFDQMTest, ScalarAdd) {
-//     TEST_START(TESTPROFILE_RUNALL);
-// 
-//     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
-//     ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
-// 
-//     HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
-//     HsaMemoryBuffer vectorA(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-//     HsaMemoryBuffer vectorB(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-//     HsaMemoryBuffer vectorC(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-// 
-//     vectorA.Fill(0x1);
-//     vectorB.Fill(0x2);
-// 
-//     m_pIsaGen->GetScalarAddIsa(isaBuffer);
-// 
-//     SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 1, 1, 1);
-// 
-//     EXPECT_EQ(vectorC.As<unsigned int*>()[0], 0x3);
-//     EXPECT_EQ(vectorC.As<unsigned int*>()[1], 0x0);
-// 
-//     TEST_END
-// }
+TEST_F(KFDQMTest, ScalarSet) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer vectorA(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorB(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorC(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+
+    vectorA.Fill(0x1);
+
+    m_pIsaGen->GetScalarSetIsa(isaBuffer);
+
+    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 1, 1, 1, 1, 1, 1);
+
+    EXPECT_EQ(vectorC.As<unsigned int*>()[0], 0x2);
+    EXPECT_EQ(vectorC.As<unsigned int*>()[1], 0x0);
+
+    TEST_END
+}
+
+TEST_F(KFDQMTest, ScalarAdd) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer vectorA(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorB(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorC(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+
+    vectorA.Fill(0x1);
+    vectorB.Fill(0x2);
+
+    m_pIsaGen->GetScalarAddIsa(isaBuffer);
+
+    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, 1, 1, 1, 1, 1, 1);
+
+    EXPECT_EQ(vectorC.As<unsigned int*>()[0], 0x3);
+    EXPECT_EQ(vectorC.As<unsigned int*>()[1], 0x0);
+
+    TEST_END
+}
 
 TEST_F(KFDQMTest, VectorSet) {
     TEST_START(TESTPROFILE_RUNALL);
