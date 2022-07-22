@@ -45,6 +45,7 @@ class IsaGenerator {
     virtual void GetScalarAddIsa(HsaMemoryBuffer& rBuf) {}
     virtual void GetVectorSetIsa(HsaMemoryBuffer& rBuf) {}
     virtual void GetVectorAddIsa(HsaMemoryBuffer& rBuf) {}
+    virtual void GetVectorGroupSetIsa(HsaMemoryBuffer& rBuf) {}
 
     virtual void GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& buf) {}
     virtual void GetGEMMIsa_16_5120_384(HsaMemoryBuffer& rBuf) {}
