@@ -141,7 +141,7 @@ void Dispatch::BuildIb() {
     unsigned int pgmRsrc2 = 0;
     pgmRsrc2 |= (/*m_ScratchEn*/0 << COMPUTE_PGM_RSRC2__SCRATCH_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__SCRATCH_EN_MASK;
-    pgmRsrc2 |= /*((m_scratch_base ? 6 : 4)*/ (16 << COMPUTE_PGM_RSRC2__USER_SGPR__SHIFT)
+    pgmRsrc2 |= /*((m_scratch_base ? 6 : 4)*/ (6 << COMPUTE_PGM_RSRC2__USER_SGPR__SHIFT)
             & COMPUTE_PGM_RSRC2__USER_SGPR_MASK;
     pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TRAP_PRESENT__SHIFT)
             & COMPUTE_PGM_RSRC2__TRAP_PRESENT_MASK;
