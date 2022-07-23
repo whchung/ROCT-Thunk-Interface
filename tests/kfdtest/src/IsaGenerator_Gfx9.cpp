@@ -199,6 +199,58 @@ const uint32_t IsaGenerator_Gfx9::VECTOR_GROUP_SET_ISA[] = {
     0xbf810000                // s_endpgm
 };
 
+const uint32_t IsaGenerator_Gfx9::VECTOR_GROUP_ADD_ISA[] = {
+                              // v[4:5] = &C
+    0x7e080200,               // v_mov_b32 v4, s0
+    0x7e0a0201,               // v_mov_b32 v5, s1
+
+                              // v[6:7] = &A
+    0x7e0c0202,               // v_mov_b32 v6, s2
+    0x7e0e0203,               // v_mov_b32 v7, s3
+
+                              // v[8:9] = &B
+    0x7e100204,               // v_mov_b32 v8, s4
+    0x7e120205,               // v_mov_b32 v9, s5
+
+                              // v1 = bid
+    0x7e020206,               // v_mov_b32 v1, s6 TGID_X
+
+                              // v1 <<= 2
+    0x68020301,               // v_add_u32 v1, v1, v1
+    0x68020301,               // v_add_u32 v1, v1, v1
+
+                              // v1 <<= 3
+    0x68020301,               // v_add_u32 v1, v1, v1
+    0x68020301,               // v_add_u32 v1, v1, v1
+    0x68020301,               // v_add_u32 v1, v1, v1
+
+                              // v2 = tid << 2
+    0x68040100,               // v_add_u32 v2, v0, v0
+    0x68040502,               // v_add_u32 v2, v2, v2
+
+                              // v1 = (tid << 2) + (bid << 5)
+    0x68020302,               // v_add_u32 v1, v1, v2
+
+                              // v4 = v4 + v1
+    0x68080901,               // v_add_u32 v4, v4, v1
+
+                              // v6 = v6 + v1
+    0x680c0d01,               // v_add_u32 v6, v6, v1
+
+                              // v8 = v8 + v1
+    0x68101101,               // v_add_u32 v8, v8, v1
+
+    0xdc530000, 0x0a7f0006,   // flat_load_dword v10, v[6:7]
+    0xdc530000, 0x0b7f0008,   // flat_load_dword v11, v[8:9]
+    0xbf8c0000,               // s_waitcnt 0
+
+    0x6814150b,               // v_add_u32 v10, v10, v11
+
+    0xdc730000, 0x007f0a04,   // flat_store_dword v[4:5], v10 slc glc
+
+    0xbf810000                // s_endpgm
+};
+
 void IsaGenerator_Gfx9::GetNoopIsa(HsaMemoryBuffer& rBuf) {
     std::copy(NOOP_ISA, NOOP_ISA+ARRAY_SIZE(NOOP_ISA), rBuf.As<uint32_t*>());
 }
@@ -237,6 +289,10 @@ void IsaGenerator_Gfx9::GetVectorAddIsa(HsaMemoryBuffer& rBuf) {
 
 void IsaGenerator_Gfx9::GetVectorGroupSetIsa(HsaMemoryBuffer& rBuf) {
       std::copy(VECTOR_GROUP_SET_ISA, VECTOR_GROUP_SET_ISA+ARRAY_SIZE(VECTOR_GROUP_SET_ISA), rBuf.As<uint32_t*>());
+}
+
+void IsaGenerator_Gfx9::GetVectorGroupAddIsa(HsaMemoryBuffer& rBuf) {
+      std::copy(VECTOR_GROUP_ADD_ISA, VECTOR_GROUP_ADD_ISA+ARRAY_SIZE(VECTOR_GROUP_ADD_ISA), rBuf.As<uint32_t*>());
 }
 
 const std::string& IsaGenerator_Gfx9::GetAsicName() {

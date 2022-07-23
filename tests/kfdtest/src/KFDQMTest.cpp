@@ -1320,12 +1320,42 @@ TEST_F(KFDQMTest, VectorGroupSet) {
 
     m_pIsaGen->GetVectorGroupSetIsa(isaBuffer);
 
+    const unsigned int GRID_SIZE_X = 256;
     const unsigned int BLOCK_SIZE_X = 8;
-    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, PAGE_SIZE/sizeof(unsigned int), 1, 1, BLOCK_SIZE_X, 1, 1);
+    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, GRID_SIZE_X, 1, 1, BLOCK_SIZE_X, 1, 1);
 
-    for (unsigned i = 0; i < PAGE_SIZE/sizeof(unsigned int); i+=BLOCK_SIZE_X) {
+    for (unsigned i = 0; i < GRID_SIZE_X; i+=BLOCK_SIZE_X) {
       for (unsigned j = 0; j < BLOCK_SIZE_X; ++j) {
         EXPECT_EQ(vectorC.As<unsigned int*>()[i+j], i/BLOCK_SIZE_X);
+      }
+    }
+
+    TEST_END
+}
+
+TEST_F(KFDQMTest, VectorGroupAdd) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer vectorA(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorB(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer vectorC(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+
+    vectorA.Fill(0x1);
+    vectorB.Fill(0x2);
+
+    m_pIsaGen->GetVectorGroupAddIsa(isaBuffer);
+
+    const unsigned int GRID_SIZE_X = 512;
+    const unsigned int BLOCK_SIZE_X = 8;
+    SyncDispatch(isaBuffer, vectorA.As<void*>(), vectorB.As<void*>(), vectorC.As<void*>(), -1, GRID_SIZE_X, 1, 1, BLOCK_SIZE_X, 1, 1);
+
+    for (unsigned i = 0; i < GRID_SIZE_X; i+=BLOCK_SIZE_X) {
+      for (unsigned j = 0; j < BLOCK_SIZE_X; ++j) {
+        EXPECT_EQ(vectorC.As<unsigned int*>()[i+j], 0x3);
       }
     }
 
