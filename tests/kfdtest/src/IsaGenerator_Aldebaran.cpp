@@ -323,7 +323,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
-0xBE8F0005,             //     s_mov_b32_s15, s5
+0xBE8F0005,             //     s_mov_b32 s15, s5
 0xBF800000,             // s_nop 0
 
 // The actual GEMM algorithm from  Microsoft based on CK.
@@ -613,7 +613,8 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
  0xBE900002,             //     s_mov_b32 s16, s2
  0xBE910003,             //     s_mov_b32 s17, s3
  0xBE920004,		 //     s_mov_b32 s18, s4
- 0xBE930005,		 //     s_mov_b32_s19, s5
+ 0xBE930005,		 //     s_mov_b32 s19, s5
+ 0xBF800000,             // s_nop 0
 
  // The actual GEMM algorithm from  Microsoft based on CK.
  0x8E028407,             //	s_lshl_b32 s2, s7, 4                                       
@@ -890,7 +891,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
-0xBE8F0005,             //     s_mov_b32_s15, s5
+0xBE8F0005,             //     s_mov_b32 s15, s5
 0xBF800000,             // s_nop 0
 
 // The actual GEMM algorithm from  Microsoft based on CK.

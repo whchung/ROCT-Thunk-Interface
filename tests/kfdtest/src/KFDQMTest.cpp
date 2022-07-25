@@ -1428,8 +1428,8 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3F800000); // 1.0f
-    matrixBBuffer.Fill(0x3F800000); // 1.0f
+    matrixABuffer.Fill(0x3F803F80); // 1.0f
+    matrixBBuffer.Fill(0x3F803F80); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
@@ -1466,8 +1466,8 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3F800000); // 1.0f
-    matrixBBuffer.Fill(0x3F800000); // 1.0f
+    matrixABuffer.Fill(0x3F803F80); // 1.0f
+    matrixBBuffer.Fill(0x3F803F80); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
@@ -1504,8 +1504,8 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3F800000); // 1.0f
-    matrixBBuffer.Fill(0x3F800000); // 1.0f
+    matrixABuffer.Fill(0x3F803F80); // 1.0f
+    matrixBBuffer.Fill(0x3F803F80); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_1280_5120(isaBuffer);
 
@@ -1542,8 +1542,8 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3F800000); // 1.0f
-    matrixBBuffer.Fill(0x3F800000); // 1.0f
+    matrixABuffer.Fill(0x3F803F80); // 1.0f
+    matrixBBuffer.Fill(0x3F803F80); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_5120_1280(isaBuffer);
 
