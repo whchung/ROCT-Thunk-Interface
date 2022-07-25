@@ -300,6 +300,8 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
 }
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
+//0xBF810000,              // s_endpgm                                                         // 000000000660:
+
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x
@@ -586,6 +588,8 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
+//0xBF810000,              // s_endpgm                                                         // 000000000660:
+
  // Original ISA:
  // s4-s5 : kernarg pointer
  // s6 : workgroup_id_x
@@ -859,6 +863,8 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
 };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
+//0xBF810000,              // s_endpgm                                                         // 000000000660:
+
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x
@@ -1144,6 +1150,8 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
+//0xBF810000,              // s_endpgm                                                         // 000000000660:
+
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x

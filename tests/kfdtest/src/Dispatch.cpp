@@ -147,9 +147,9 @@ void Dispatch::BuildIb() {
             & COMPUTE_PGM_RSRC2__TRAP_PRESENT_MASK;
     pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_X_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_X_EN_MASK;
-    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TGID_Y_EN__SHIFT)
+    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_Y_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_Y_EN_MASK;
-    pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TGID_Z_EN__SHIFT)
+    pgmRsrc2 |= (1 << COMPUTE_PGM_RSRC2__TGID_Z_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TGID_Z_EN_MASK;
     pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__TG_SIZE_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__TG_SIZE_EN_MASK;
@@ -163,9 +163,9 @@ void Dispatch::BuildIb() {
             & COMPUTE_PGM_RSRC2__EXCP_EN_MSB_MASK;
 
     const unsigned int COMPUTE_PGM_RSRC[] = {
-        // PGM_RSRC1 = { VGPRS: 16 SGPRS: 32 PRIORITY: m_SpiPriority FLOAT_MODE: c0 PRIV: 0
-        // DX10_CLAMP: 0 DEBUG_MODE: 0 IEEE_MODE: 0 BULKY: 0 CDBG_USER: 0 }
-        0x000c0104 | ((m_SpiPriority & 3) << 10),
+        // PGM_RSRC1 = { VGPRS: 48 SGPRS: 32 PRIORITY: m_SpiPriority FLOAT_MODE: 240 PRIV: 0
+        // DX10_CLAMP: 0 DEBUG_MODE: 0 IEEE_MODE: 1 BULKY: 0 CDBG_USER: 0 }
+        0x004f810c | ((m_SpiPriority & 3) << 10),
         pgmRsrc2
     };
 
@@ -245,7 +245,14 @@ void Dispatch::BuildIb() {
                                                   ARRAY_SIZE(COMPUTE_PGM_RSRC)));
 
     if (m_FamilyId == FAMILY_AL) {
+#define COMPUTE_PGM_RSRC3__ACCUM_OFFSET__SHIFT 0x0
+#define COMPUTE_PGM_RSRC3__TG_SPLIT__SHIFT     0x10
+#define COMPUTE_PGM_RSRC3__ACCUM_OFFSET_MASK   0x0000003FL
+#define COMPUTE_PGM_RSRC3__TG_SPLIT__MASK      0x00010000L
+//; COMPUTE_PGM_RSRC3_GFX90A:ACCUM_OFFSET: 9
+//; COMPUTE_PGM_RSRC3_GFX90A:TG_SPLIT: 0
         const unsigned int COMPUTE_PGM_RSRC3[] = {9};
+	//LOG() << "sizeof(COMPUTE_PGM_RSRC3): " << ARRAY_SIZE(COMPUTE_PGM_RSRC3) << "\n";
         m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_PGM_RSRC3, COMPUTE_PGM_RSRC3,
                                                       ARRAY_SIZE(COMPUTE_PGM_RSRC3)));
     }
