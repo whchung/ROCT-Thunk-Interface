@@ -258,8 +258,8 @@ void Dispatch::BuildIb() {
     m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_USER_DATA_0, COMPUTE_USER_DATA_VALUES,
                                                   ARRAY_SIZE(COMPUTE_USER_DATA_VALUES)));
 
-    LOG() << std::dec << "Dim: " << m_DimX << " " << m_DimY << " " << m_DimZ << std::hex << "\n";
-    LOG() << std::dec << "Block: " << m_BlockX << " " << m_BlockY << " " << m_BlockZ << std::hex << "\n";
+    //LOG() << std::dec << "Dim: " << m_DimX << " " << m_DimY << " " << m_DimZ << std::hex << "\n";
+    //LOG() << std::dec << "Block: " << m_BlockX << " " << m_BlockY << " " << m_BlockZ << std::hex << "\n";
     m_IndirectBuf.AddPacket(PM4DispatchDirectPacket(m_DimX, m_DimY, m_DimZ, DISPATCH_INIT_VALUE));
 
     // EVENT_WRITE.partial_flush causes problems with preemptions in
