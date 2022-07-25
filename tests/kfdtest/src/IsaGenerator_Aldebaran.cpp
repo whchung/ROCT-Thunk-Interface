@@ -299,9 +299,11 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
     return ASIC_NAME;
 }
 
+#define EMPTY_GEMM_KERNEL (0)
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
-//0xBF810000,              // s_endpgm                                                         // 000000000660:
-
+#if EMPTY_GEMM_KERNEL
+0xBF810000,              // s_endpgm                                                         // 000000000660:
+#else
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x
@@ -585,11 +587,13 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 0xD2A00000, 0x00020702, // v_pack_b32_f16 v0, v2, v3                                        // 00000000062C: 
 0xE1381080, 0x84000004, // buffer_atomic_pk_add_f16 v0, v4, s[0:3], 4 offen offset:128      // 000000000634: 
 0xBF810000              // s_endpgm                                                         // 00000000063C: 
+#endif
 };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
-//0xBF810000,              // s_endpgm                                                         // 000000000660:
-
+#if EMPTY_GEMM_KERNEL
+0xBF810000,              // s_endpgm                                                         // 000000000660:
+#else
  // Original ISA:
  // s4-s5 : kernarg pointer
  // s6 : workgroup_id_x
@@ -860,11 +864,13 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
  0xD2A00000, 0x00020702, //	v_pack_b32_f16 v0, v2, v3                                  
  0xE1381080, 0x8400000B, //	buffer_atomic_pk_add_f16 v0, v11, s[0:3], 4 offen offset:128
  0xBF810000              //	s_endpgm                                                   
+#endif
 };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
-//0xBF810000,              // s_endpgm                                                         // 000000000660:
-
+#if EMPTY_GEMM_KERNEL
+0xBF810000,              // s_endpgm                                                         // 000000000660:
+#else
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x
@@ -1147,11 +1153,13 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 0xD2A00000, 0x00020702, // v_pack_b32_f16 v0, v2, v3                                        // 000000000628: 
 0xE1381080, 0x84000004, // buffer_atomic_pk_add_f16 v0, v4, s[0:3], 4 offen offset:128      // 000000000630: 
 0xBF810000              // s_endpgm                                                         // 000000000638: 
+#endif
 };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
-//0xBF810000,              // s_endpgm                                                         // 000000000660:
-
+#if EMPTY_GEMM_KERNEL
+0xBF810000,              // s_endpgm                                                         // 000000000660:
+#else
 // Original ISA:
 // s4-s5 : kernarg pointer
 // s6 : workgroup_id_x
@@ -1442,6 +1450,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
 0xD2A00000, 0x00020702, // v_pack_b32_f16 v0, v2, v3                                        // 000000000650: 
 0xE1381080, 0x84000004, // buffer_atomic_pk_add_f16 v0, v4, s[0:3], 4 offen offset:128      // 000000000658: 
 0xBF810000              // s_endpgm                                                         // 000000000660: 
+#endif
 };
 
 void IsaGenerator_Aldbrn::GetGEMMIsa_16_1152_5120(HsaMemoryBuffer& rBuf) {

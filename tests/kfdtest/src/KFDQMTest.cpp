@@ -1365,7 +1365,7 @@ TEST_F(KFDQMTest, VectorGroupAdd) {
 void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z) {
     PM4Queue queue;
     HsaClockCounters *ts;
-    HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 2, PAGE_SIZE), 0);
+    HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 1, PAGE_SIZE), 0);
     ts = buf.As<HsaClockCounters*>();
 
     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
@@ -1388,15 +1388,16 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     const int ITERATION = 10;
     HSAint64 latency_total = 0;
     HSAint64 begin, end, latency;
+    hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+    begin = ts[0].GPUClockCounter;
     for (int iter = 0; iter < ITERATION; ++iter) {
-      hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
       dispatch.Submit(queue);
       dispatch.Sync();
-      hsaKmtGetClockCounters(defaultGPUNode, &ts[1]);
-      begin = ts[0].GPUClockCounter;
-      end = ts[1].GPUClockCounter;
+      hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+      end = ts[0].GPUClockCounter;
       latency = end - begin;
-      LOG() << "Latency(ns): " << std::dec << CounterToNanoSec(latency) << std::endl;
+      begin = end;
+      //LOG() << "Latency(ns): " << std::dec << CounterToNanoSec(latency) << std::endl;
       latency_total += latency;
     }
     LOG() << "Avg latency(ns): " << std::dec << (CounterToNanoSec(latency_total) / ITERATION) << std::endl;
@@ -1427,14 +1428,17 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0xDEADBEEF);
-    matrixBBuffer.Fill(0x0A3D0A3D);
+    matrixABuffer.Fill(0x3F800000); // 1.0f
+    matrixBBuffer.Fill(0x3F800000); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 8);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+    //LOG() << matrixABuffer.As<float*>()[0] << "\n";
+    //LOG() << matrixBBuffer.As<float*>()[1] << "\n";
+    //LOG() << matrixCBuffer.As<float*>()[2] << "\n";
 
     TEST_END
 }
@@ -1462,14 +1466,17 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0xDEADBEEF);
-    matrixBBuffer.Fill(0x0A3D0A3D);
+    matrixABuffer.Fill(0x3F800000); // 1.0f
+    matrixBBuffer.Fill(0x3F800000); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 4);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+    //LOG() << matrixABuffer.As<float*>()[0] << "\n";
+    //LOG() << matrixBBuffer.As<float*>()[1] << "\n";
+    //LOG() << matrixCBuffer.As<float*>()[2] << "\n";
 
     TEST_END
 }
@@ -1497,14 +1504,17 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0xDEADBEEF);
-    matrixBBuffer.Fill(0x0A3D0A3D);
+    matrixABuffer.Fill(0x3F800000); // 1.0f
+    matrixBBuffer.Fill(0x3F800000); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_1280_5120(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 8);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+    //LOG() << matrixABuffer.As<float*>()[0] << "\n";
+    //LOG() << matrixBBuffer.As<float*>()[1] << "\n";
+    //LOG() << matrixCBuffer.As<float*>()[2] << "\n";
 
     TEST_END
 }
@@ -1532,14 +1542,17 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0xDEADBEEF);
-    matrixBBuffer.Fill(0x0A3D0A3D);
+    matrixABuffer.Fill(0x3F800000); // 1.0f
+    matrixBBuffer.Fill(0x3F800000); // 1.0f
 
     m_pIsaGen->GetGEMMIsa_16_5120_1280(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 8);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+    //LOG() << matrixABuffer.As<float*>()[0] << "\n";
+    //LOG() << matrixBBuffer.As<float*>()[1] << "\n";
+    //LOG() << matrixCBuffer.As<float*>()[2] << "\n";
 
     TEST_END
 }
