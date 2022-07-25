@@ -157,6 +157,8 @@ void Dispatch::BuildIb() {
             & COMPUTE_PGM_RSRC2__TIDIG_COMP_CNT_MASK;
     pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__EXCP_EN__SHIFT)
             & COMPUTE_PGM_RSRC2__EXCP_EN_MASK;
+    pgmRsrc2 |= (0x80 << COMPUTE_PGM_RSRC2__LDS_SIZE__SHIFT)
+            & COMPUTE_PGM_RSRC2__LDS_SIZE_MASK;
     pgmRsrc2 |= (0 << COMPUTE_PGM_RSRC2__EXCP_EN_MSB__SHIFT)
             & COMPUTE_PGM_RSRC2__EXCP_EN_MSB_MASK;
 
