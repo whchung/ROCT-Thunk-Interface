@@ -1379,6 +1379,8 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     dispatch.SetDim(X, Y, Z);
     dispatch.SetBlock(256, 1, 1);
 
+    //hsaKmtSetMemoryPolicy(defaultGPUNode, HSA_CACHING_CACHED, HSA_CACHING_CACHED, NULL, 0);
+
     ASSERT_SUCCESS(queue.Create(defaultGPUNode));
 
     // warm-up
@@ -1428,17 +1430,28 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3F803F80); // 1.0f
-    matrixBBuffer.Fill(0x3F803F80); // 1.0f
+    matrixABuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+    matrixBBuffer.Fill(0x3C003C00);
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 8);
+    //SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 8);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1);
 
     //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
-    //LOG() << matrixABuffer.As<float*>()[0] << "\n";
-    //LOG() << matrixBBuffer.As<float*>()[1] << "\n";
-    //LOG() << matrixCBuffer.As<float*>()[2] << "\n";
+    //LOG() << "matrix A\n";
+    //for (unsigned int i = 0; i < 4; ++i) {
+    //LOG() << std::hex << matrixABuffer.As<unsigned int*>()[i] << "\n";
+    //}
+    //LOG() << "matrix B\n";
+    //for (unsigned int i = 0; i < 4; ++i) {
+    //LOG() << std::hex << matrixBBuffer.As<unsigned int*>()[i] << "\n";
+    //}
+    //LOG() << "matrix C\n";
+    for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
+      //LOG() << std::hex << matrixCBuffer.As<unsigned int*>()[i] << "\n";
+      EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[i], 0x6d006d00);
+    }
 
     TEST_END
 }
@@ -1885,83 +1898,83 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
 //
 //    TEST_END
 //}
-//
-//struct AtomicIncThreadParams {
-//    HSAint64* pDest;
-//    volatile unsigned int count;
-//    volatile bool loop;
-//};
-//
-//unsigned int AtomicIncThread(void* pCtx) {
-//    AtomicIncThreadParams* pArgs = reinterpret_cast<AtomicIncThreadParams*>(pCtx);
-//
-//    while (pArgs->loop) {
-//        AtomicInc(pArgs->pDest);
-//        ++pArgs->count;
-//    }
-//
-//    LOG() << "CPU atomic increments finished" << std::endl;
-//
-//    return 0;
-//}
-//
-//TEST_F(KFDQMTest, Atomics) {
-//    TEST_START(TESTPROFILE_RUNALL);
-//    /* CI doesn't support Atomics. KV does, but gets its own FAMILY_KV def */
-//    if (m_FamilyId == FAMILY_CI) {
-//        LOG() << "Skipping test: CI doesn't support Atomics." << std::endl;
-//        return;
-//    }
-//    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
-//    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
-//
-//    HsaMemoryBuffer isaBuf(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
-//    HsaMemoryBuffer destBuf(PAGE_SIZE, defaultGPUNode);
-//
-//    PM4Queue queue;
-//
-//    m_pIsaGen->GetAtomicIncIsa(isaBuf);
-//
-//    Dispatch dispatch(isaBuf);
-//    dispatch.SetArgs(destBuf.As<void*>(), NULL);
-//    dispatch.SetDim(1024, 1, 1);
-//
-//    hsaKmtSetMemoryPolicy(defaultGPUNode, HSA_CACHING_CACHED, HSA_CACHING_CACHED, NULL, 0);
-//
-//    ASSERT_SUCCESS(queue.Create(defaultGPUNode));
-//
-//    AtomicIncThreadParams params;
-//    params.pDest = destBuf.As<HSAint64*>();
-//    params.loop = true;
-//    params.count = 0;
-//
-//    uint64_t threadId;
-//
-//    ASSERT_EQ(true, StartThread(&AtomicIncThread, &params, threadId));
-//
-//    LOG() << "Waiting for CPU to atomic increment 1000 times" << std::endl;
-//
-//    while (params.count < 1000)
-//        {}
-//
-//    LOG() << "Submitting the GPU atomic increment shader" << std::endl;
-//
-//    dispatch.Submit(queue);
-//    dispatch.Sync();
-//
-//    params.loop = false;
-//
-//    WaitForThread(threadId);
-//
-//    EXPECT_EQ(destBuf.As<unsigned int*>()[0], 1024 + params.count);
-//
-//    LOG() << "GPU increments: 1024, CPU increments: " << std::dec
-//            << params.count << std::endl;
-//
-//    queue.Destroy();
-//
-//    TEST_END
-//}
+
+struct AtomicIncThreadParams {
+    HSAint64* pDest;
+    volatile unsigned int count;
+    volatile bool loop;
+};
+
+unsigned int AtomicIncThread(void* pCtx) {
+    AtomicIncThreadParams* pArgs = reinterpret_cast<AtomicIncThreadParams*>(pCtx);
+
+    while (pArgs->loop) {
+        AtomicInc(pArgs->pDest);
+        ++pArgs->count;
+    }
+
+    LOG() << "CPU atomic increments finished" << std::endl;
+
+    return 0;
+}
+
+TEST_F(KFDQMTest, Atomics) {
+    TEST_START(TESTPROFILE_RUNALL);
+    /* CI doesn't support Atomics. KV does, but gets its own FAMILY_KV def */
+    if (m_FamilyId == FAMILY_CI) {
+        LOG() << "Skipping test: CI doesn't support Atomics." << std::endl;
+        return;
+    }
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuf(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer destBuf(PAGE_SIZE, defaultGPUNode);
+
+    PM4Queue queue;
+
+    m_pIsaGen->GetAtomicIncIsa(isaBuf);
+
+    Dispatch dispatch(isaBuf);
+    dispatch.SetArgs(destBuf.As<void*>(), NULL);
+    dispatch.SetDim(1024, 1, 1);
+
+    hsaKmtSetMemoryPolicy(defaultGPUNode, HSA_CACHING_CACHED, HSA_CACHING_CACHED, NULL, 0);
+
+    ASSERT_SUCCESS(queue.Create(defaultGPUNode));
+
+    AtomicIncThreadParams params;
+    params.pDest = destBuf.As<HSAint64*>();
+    params.loop = true;
+    params.count = 0;
+
+    uint64_t threadId;
+
+    ASSERT_EQ(true, StartThread(&AtomicIncThread, &params, threadId));
+
+    LOG() << "Waiting for CPU to atomic increment 1000 times" << std::endl;
+
+    while (params.count < 1000)
+        {}
+
+    LOG() << "Submitting the GPU atomic increment shader" << std::endl;
+
+    dispatch.Submit(queue);
+    dispatch.Sync();
+
+    params.loop = false;
+
+    WaitForThread(threadId);
+
+    EXPECT_EQ(destBuf.As<unsigned int*>()[0], 1024 + params.count);
+
+    LOG() << "GPU increments: 1024, CPU increments: " << std::dec
+            << params.count << std::endl;
+
+    queue.Destroy();
+
+    TEST_END
+}
 
 // TEST_F(KFDQMTest, mGPUShareBO) {
 //     TEST_START(TESTPROFILE_RUNALL);
