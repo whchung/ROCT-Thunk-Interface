@@ -163,9 +163,9 @@ void Dispatch::BuildIb() {
             & COMPUTE_PGM_RSRC2__EXCP_EN_MSB_MASK;
 
     const unsigned int COMPUTE_PGM_RSRC[] = {
-        // PGM_RSRC1 = { VGPRS: 52 (44+8) SGPRS: 16 PRIORITY: m_SpiPriority FLOAT_MODE: 240 PRIV: 0
+        // PGM_RSRC1 = { VGPRS: 52 (44+8) SGPRS: 32 PRIORITY: m_SpiPriority FLOAT_MODE: 240 PRIV: 0
         // DX10_CLAMP: 0 DEBUG_MODE: 0 IEEE_MODE: 1 BULKY: 0 CDBG_USER: 0 }
-        0x004f804d | ((m_SpiPriority & 3) << 10),
+        0x004f808d | ((m_SpiPriority & 3) << 10),
         pgmRsrc2
     };
 
