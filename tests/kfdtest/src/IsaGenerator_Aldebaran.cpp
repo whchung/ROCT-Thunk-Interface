@@ -299,8 +299,6 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
     return ASIC_NAME;
 }
 
-#define EMPTY_GEMM_KERNEL (0)
-
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 #if EMPTY_GEMM_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:

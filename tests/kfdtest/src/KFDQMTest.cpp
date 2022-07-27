@@ -1548,6 +1548,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1);
 
+#if !EMPTY_GEMM_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1559,6 +1560,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
       EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
       EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
+#endif
 
     TEST_END
 }
@@ -1612,6 +1614,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 1);
 
+#if !EMPTY_GEMM_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1623,6 +1626,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
       EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
       EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
+#endif
 
     TEST_END
 }
@@ -1676,6 +1680,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 1);
 
+#if !EMPTY_GEMM_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1687,6 +1692,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
       EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
       EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
+#endif
 
     TEST_END
 }
@@ -1740,6 +1746,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 1);
 
+#if !EMPTY_GEMM_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1751,6 +1758,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
       EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
       EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
+#endif
 
     TEST_END
 }
