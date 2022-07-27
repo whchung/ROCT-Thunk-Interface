@@ -1466,9 +1466,43 @@ unsigned int ConvertI32ToPackedF16x2(int value) {
     return result;
 }
 
-static int A[16 * 5120];
-static int B[5120 * 1152];
-static int C[16 * 1152];
+void CPUGEMM(int *A, int* B, int *C, int M, int N, int K) {
+  for (unsigned int i = 0; i < M; ++i) {
+    for (unsigned int j = 0; j < N; ++j) {
+      int acc = 0;
+      for (unsigned int k = 0; k < K; ++k) {
+        acc += A[i * K + k] * B[k * N + j];
+      }
+      C[i * N + j] = acc;
+    }
+  }
+  //std::cout << "Matrix A\n";
+  //for (unsigned i = 0; i < M; ++i) {
+  //  for (unsigned j = 0; j < K; ++j) {
+  //    std::cout << std::dec << A[i * K + j] << " ";
+  //  }
+  //  std::cout << "\n";
+  //}
+  //std::cout << "Matrix B\n";
+  //for (unsigned i = 0; i < K; ++i) {
+  //  for (unsigned j = 0; j < N; ++j) {
+  //    std::cout << std::dec << B[i * N + j] << " ";
+  //  }
+  //  std::cout << "\n";
+  //}
+  //std::cout << "Matrix C\n";
+  //for (unsigned i = 0; i < M; ++i) {
+  //  for (unsigned j = 0; j < N; ++j) {
+  //    std::cout << std::hex << int2hfloat(C[i * N + j]) << " ";
+  //  }
+  //  std::cout << "\n";
+  //}
+}
+
+static int A_16_1152_5120[16 * 5120];
+static int B_16_1152_5120[5120 * 1152];
+static int C_16_1152_5120[16 * 1152];
+
 TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     TEST_START(TESTPROFILE_RUNALL);
 
@@ -1494,6 +1528,11 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 
     //matrixABuffer.Fill(0x40004000); // 2.0 (half) / 2.0 (half)
     //matrixBBuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+    
+    int *A = A_16_1152_5120;
+    int *B = B_16_1152_5120;
+    int *C = C_16_1152_5120;
+    // Initilize A/B with patterns.
     for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
       matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
       A[i * 2] = -5 + i % 11;
@@ -1509,39 +1548,8 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1);
 
-    for (unsigned int i = 0; i < M; ++i) {
-      for (unsigned int j = 0; j < N; ++j) {
-	int acc = 0;
-        for (unsigned int k = 0; k < K; ++k) {
-          acc += A[i * K + k] * B[k * N + j];
-	}
-	C[i * N + j] = acc;
-      }
-    }
-    //std::cout << "Matrix A\n";
-    //for (unsigned i = 0; i < M; ++i) {
-    //  for (unsigned j = 0; j < K; ++j) {
-    //    std::cout << std::dec << A[i * K + j] << " ";
-    //  }
-    //  std::cout << "\n";
-    //}
-    //std::cout << "Matrix B\n";
-    //for (unsigned i = 0; i < K; ++i) {
-    //  for (unsigned j = 0; j < N; ++j) {
-    //    std::cout << std::dec << B[i * N + j] << " ";
-    //  }
-    //  std::cout << "\n";
-    //}
-    //std::cout << "Matrix C\n";
-    //for (unsigned i = 0; i < M; ++i) {
-    //  for (unsigned j = 0; j < N; ++j) {
-    //    //std::cout << std::dec << C[i * N + j] << " ";
-    //    std::cout << std::hex << int2hfloat(C[i * N + j]) << " ";
-    //  }
-    //  std::cout << "\n";
-    //}
+    CPUGEMM(A, B, C, M, N, K);
 
-    //std::cout << "Matrix C from GPU\n";
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
       //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
       unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
@@ -1555,6 +1563,10 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     TEST_END
 }
  
+static int A_16_5120_384[16 * 384];
+static int B_16_5120_384[384 * 5120];
+static int C_16_5120_384[16 * 5120];
+
 TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
     TEST_START(TESTPROFILE_RUNALL);
 
@@ -1578,20 +1590,46 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
-    matrixBBuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+    //matrixABuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+    //matrixBBuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+
+    int *A = A_16_5120_384;
+    int *B = B_16_5120_384;
+    int *C = C_16_5120_384;
+    // Initilize A/B with patterns.
+    for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
+      A[i * 2] = -5 + i % 11;
+      A[i * 2 + 1] = -5 + i % 11;
+    }
+    for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
+      B[i * 2] = -5 + i % 11;
+      B[i * 2 + 1] = -5 + i % 11;
+    }
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 1);
 
+    CPUGEMM(A, B, C, M, N, K);
+
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
-      //LOG() << std::hex << matrixCBuffer.As<unsigned int*>()[i] << "\n";
-      //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[i], 0x5e005e00);
+      //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
+      unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
+      unsigned int gpu_lsb = matrixCBuffer.As<unsigned int*>()[i] & 0xFFFF;
+      unsigned int cpu_msb = int2hfloat(C[i * 2]);
+      unsigned int cpu_lsb = int2hfloat(C[i * 2 + 1]);
+      EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
+      EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
 
     TEST_END
 }
+
+static int A_16_1280_5120[16 * 5120];
+static int B_16_1280_5120[5120 * 1280];
+static int C_16_1280_5120[16 * 1280];
 
 TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
     TEST_START(TESTPROFILE_RUNALL);
@@ -1616,20 +1654,46 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x40004000); // 2.0 (half) / 2.0 (half)
-    matrixBBuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+    //matrixABuffer.Fill(0x40004000); // 2.0 (half) / 2.0 (half)
+    //matrixBBuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+
+    int *A = A_16_1280_5120;
+    int *B = B_16_1280_5120;
+    int *C = C_16_1280_5120;
+    // Initilize A/B with patterns.
+    for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
+      A[i * 2] = -5 + i % 11;
+      A[i * 2 + 1] = -5 + i % 11;
+    }
+    for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
+      B[i * 2] = -5 + i % 11;
+      B[i * 2 + 1] = -5 + i % 11;
+    }
 
     m_pIsaGen->GetGEMMIsa_16_1280_5120(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 1);
 
+    CPUGEMM(A, B, C, M, N, K);
+
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
-      //LOG() << std::hex << matrixCBuffer.As<unsigned int*>()[i] << "\n";
-      //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[i], 0x71007100);
+      //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
+      unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
+      unsigned int gpu_lsb = matrixCBuffer.As<unsigned int*>()[i] & 0xFFFF;
+      unsigned int cpu_msb = int2hfloat(C[i * 2]);
+      unsigned int cpu_lsb = int2hfloat(C[i * 2 + 1]);
+      EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
+      EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
 
     TEST_END
 }
+
+static int A_16_5120_1280[16 * 1280];
+static int B_16_5120_1280[1280 * 5120];
+static int C_16_5120_1280[16 * 5120];
 
 TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
     TEST_START(TESTPROFILE_RUNALL);
@@ -1654,16 +1718,38 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
     HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
     HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
 
-    matrixABuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
-    matrixBBuffer.Fill(0x40004000); // 2.0 (half) / 2.0 (half)
+    //matrixABuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+    //matrixBBuffer.Fill(0x40004000); // 2.0 (half) / 2.0 (half)
+
+    int *A = A_16_5120_1280;
+    int *B = B_16_5120_1280;
+    int *C = C_16_5120_1280;
+    // Initilize A/B with patterns.
+    for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
+      A[i * 2] = -5 + i % 11;
+      A[i * 2 + 1] = -5 + i % 11;
+    }
+    for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
+      B[i * 2] = -5 + i % 11;
+      B[i * 2 + 1] = -5 + i % 11;
+    }
 
     m_pIsaGen->GetGEMMIsa_16_5120_1280(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 1);
 
+    CPUGEMM(A, B, C, M, N, K);
+
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
-      //LOG() << std::hex << matrixCBuffer.As<unsigned int*>()[i] << "\n";
-      //EXPECT_EQ(matrixCBuffer.As<unsigned int*>()[i], 0x69006900);
+      //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
+      unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
+      unsigned int gpu_lsb = matrixCBuffer.As<unsigned int*>()[i] & 0xFFFF;
+      unsigned int cpu_msb = int2hfloat(C[i * 2]);
+      unsigned int cpu_lsb = int2hfloat(C[i * 2 + 1]);
+      EXPECT_LE((gpu_msb >= cpu_msb) ? (gpu_msb - cpu_msb) : (cpu_msb - gpu_msb), 1);
+      EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
 
     TEST_END
