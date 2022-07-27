@@ -300,7 +300,7 @@ const std::string& IsaGenerator_Aldbrn::GetAsicName() {
 }
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
-#if EMPTY_GEMM_KERNEL
+#if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000:
@@ -572,7 +572,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 // GEMM kernels using atomic instructions (buffer_atomic_pk_add_f16) not working for some reason.
 //
 //const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
-// #if EMPTY_GEMM_KERNEL
+// #if USE_EMPTY_KERNEL
 // 0xBF810000,              // s_endpgm                                                         // 000000000660:
 // #else
 // // Original ISA:
@@ -872,7 +872,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 // };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
-#if EMPTY_GEMM_KERNEL
+#if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000:
@@ -1149,7 +1149,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
 // GEMM kernels using atomic instructions (buffer_atomic_pk_add_f16) not working for some reason.
 //
 // const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
-// #if EMPTY_GEMM_KERNEL
+// #if USE_EMPTY_KERNEL
 // 0xBF810000,              // s_endpgm                                                         // 000000000660:
 // #else
 //  // Original ISA:
@@ -1427,7 +1427,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
 // };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
-#if EMPTY_GEMM_KERNEL
+#if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000: 
@@ -1699,7 +1699,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 // GEMM kernels using atomic instructions (buffer_atomic_pk_add_f16) not working for some reason.
 //
 // const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
-// #if EMPTY_GEMM_KERNEL
+// #if USE_EMPTY_KERNEL
 // 0xBF810000,              // s_endpgm                                                         // 000000000660:
 // #else
 // // Original ISA:
@@ -1988,7 +1988,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 // };
 
 const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
-#if EMPTY_GEMM_KERNEL
+#if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000: 
@@ -2264,7 +2264,7 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
 // GEMM kernels using atomic instructions (buffer_atomic_pk_add_f16) not working for some reason.
 //
 // const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
-// #if EMPTY_GEMM_KERNEL
+// #if USE_EMPTY_KERNEL
 // 0xBF810000,              // s_endpgm                                                         // 000000000660:
 // #else
 // // Original ISA:

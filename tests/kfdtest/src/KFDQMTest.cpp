@@ -1533,22 +1533,25 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     int *B = B_16_1152_5120;
     int *C = C_16_1152_5120;
     // Initilize A/B with patterns.
+    srand(time(NULL));
     for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
-      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      A[i * 2] = -5 + i % 11;
-      A[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A[i * 2] = value;
+      A[i * 2 + 1] = value;
     }
     for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
-      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      B[i * 2] = -5 + i % 11;
-      B[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B[i * 2] = value;
+      B[i * 2 + 1] = value;
     }
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1);
 
-#if !EMPTY_GEMM_KERNEL
+#if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1599,22 +1602,25 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
     int *B = B_16_5120_384;
     int *C = C_16_5120_384;
     // Initilize A/B with patterns.
+    srand(time(NULL));
     for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
-      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      A[i * 2] = -5 + i % 11;
-      A[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A[i * 2] = value;
+      A[i * 2 + 1] = value;
     }
     for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
-      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      B[i * 2] = -5 + i % 11;
-      B[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B[i * 2] = value;
+      B[i * 2 + 1] = value;
     }
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 1);
 
-#if !EMPTY_GEMM_KERNEL
+#if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1665,22 +1671,25 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
     int *B = B_16_1280_5120;
     int *C = C_16_1280_5120;
     // Initilize A/B with patterns.
+    srand(time(NULL));
     for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
-      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      A[i * 2] = -5 + i % 11;
-      A[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A[i * 2] = value;
+      A[i * 2 + 1] = value;
     }
     for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
-      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      B[i * 2] = -5 + i % 11;
-      B[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B[i * 2] = value;
+      B[i * 2 + 1] = value;
     }
 
     m_pIsaGen->GetGEMMIsa_16_1280_5120(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 1);
 
-#if !EMPTY_GEMM_KERNEL
+#if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
@@ -1731,22 +1740,25 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
     int *B = B_16_5120_1280;
     int *C = C_16_5120_1280;
     // Initilize A/B with patterns.
+    srand(time(NULL));
     for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
-      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      A[i * 2] = -5 + i % 11;
-      A[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A[i * 2] = value;
+      A[i * 2 + 1] = value;
     }
     for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
-      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(-5 + i % 11);
-      B[i * 2] = -5 + i % 11;
-      B[i * 2 + 1] = -5 + i % 11;
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B[i * 2] = value;
+      B[i * 2 + 1] = value;
     }
 
     m_pIsaGen->GetGEMMIsa_16_5120_1280(isaBuffer);
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 1);
 
-#if !EMPTY_GEMM_KERNEL
+#if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {

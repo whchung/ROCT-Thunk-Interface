@@ -24,7 +24,8 @@
 #ifndef __KFD__TEST__UTIL__H__
 #define __KFD__TEST__UTIL__H__
 
-#define EMPTY_GEMM_KERNEL (0)
+#define USE_EMPTY_KERNEL (0)
+#define USE_RAND_INIT (1)
 
 #include <gtest/gtest.h>
 #include <vector>
