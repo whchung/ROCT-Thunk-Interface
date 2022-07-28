@@ -1382,30 +1382,31 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     ASSERT_SUCCESS(queue.Create(defaultGPUNode));
 
     // warm-up
-    dispatch.Submit(queue);
+    dispatch.SubmitWarmup(queue);
     dispatch.Sync();
 
     const int ITERATION = 10;
-    HSAint64 latency_total = 0;
-    HSAint64 begin, end, latency;
-    HSAint64 startTime, endTime, latencyUs = 0;
+    HSAint64 latency_total_ns = 0;
+    HSAint64 latency_total_us = 0;
+    HSAint64 begin_ns, end_ns, latency_ns;
+    HSAint64 begin_us, end_us, latency_us;
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
-    begin = ts[0].GPUClockCounter;
+    begin_ns = ts[0].GPUClockCounter;
     for (int iter = 0; iter < ITERATION; ++iter) {
-      startTime = GetSystemTickCountInMicroSec();
+      begin_us = GetSystemTickCountInMicroSec();
       dispatch.Submit(queue);
       dispatch.Sync();
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
-      end = ts[0].GPUClockCounter;
-      latency = end - begin;
-      begin = end;
-      endTime = GetSystemTickCountInMicroSec();
-      //LOG() << "Latency(ns): " << std::dec << CounterToNanoSec(latency) << std::endl;
-      latency_total += latency;
-      latencyUs += (endTime - startTime);
+      end_ns = ts[0].GPUClockCounter;
+      latency_ns = end_ns - begin_ns;
+      begin_ns = end_ns;
+      end_us = GetSystemTickCountInMicroSec();
+      latency_us = end_us - begin_us;
+      latency_total_ns += latency_ns;
+      latency_total_us += latency_us;
     }
-    LOG() << "Avg latency(ns): " << std::dec << (CounterToNanoSec(latency_total) / ITERATION) << std::endl;
-    LOG() << "Avg latency(us): " << std::dec << (latencyUs / ITERATION) << std::endl;
+    LOG() << "Avg latency(ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
+    LOG() << "Avg latency(us): " << std::dec << (latency_total_us / ITERATION) << std::endl;
 
     EXPECT_SUCCESS(queue.Destroy());
 }
