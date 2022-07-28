@@ -1387,19 +1387,27 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
 
     const int ITERATION = 10;
     HSAint64 latency_total_ns = 0;
+    HSAint64 latency_total_cpu_ns = 0;
     HSAint64 begin_ns, end_ns, latency_ns;
+    HSAint64 begin_cpu_ns, end_cpu_ns, latency_cpu_ns;
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
     begin_ns = ts[0].GPUClockCounter;
+    begin_cpu_ns = ts[0].CPUClockCounter;
     for (int iter = 0; iter < ITERATION; ++iter) {
       dispatch.Submit(queue);
       dispatch.Sync();
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
       end_ns = ts[0].GPUClockCounter;
+      end_cpu_ns = ts[0].CPUClockCounter;
       latency_ns = end_ns - begin_ns;
+      latency_cpu_ns = end_cpu_ns - begin_cpu_ns;
       begin_ns = end_ns;
+      begin_cpu_ns = end_cpu_ns;
       latency_total_ns += latency_ns;
+      latency_total_cpu_ns += latency_cpu_ns;
     }
-    LOG() << "Avg latency(ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
+    LOG() << "Avg latency GPU(ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
+    LOG() << "Avg latency CPU(ns): " << std::dec << (latency_total_cpu_ns / ITERATION) << std::endl;
 
     EXPECT_SUCCESS(queue.Destroy());
 }
