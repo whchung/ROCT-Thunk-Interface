@@ -85,11 +85,31 @@ void Dispatch::SetSpiPriority(unsigned int priority) {
     m_SpiPriority = priority;
 }
 
+void Dispatch::SubmitWarmup(BaseQueue& queue) {
+    ASSERT_NE(m_pEop, (void*)0);
+    EXPECT_EQ(m_FamilyId, queue.GetFamilyId());
+
+    BuildIb(false);
+
+    queue.PlaceAndSubmitPacket(PM4IndirectBufPacket(&m_IndirectBuf));
+
+    // Write data to SyncVar for synchronization purpose
+    if (m_pEop->EventData.EventData.SyncVar.SyncVar.UserData != NULL) {
+        queue.PlaceAndSubmitPacket(PM4WriteDataPacket((unsigned int*)m_pEop->
+            EventData.EventData.SyncVar.SyncVar.UserData, m_pEop->EventId));
+    }
+
+    queue.PlaceAndSubmitPacket(PM4ReleaseMemoryPacket(m_FamilyId, false, m_pEop->EventData.HWData2, m_pEop->EventId));
+
+    if (!queue.GetSkipWaitConsump())
+        queue.Wait4PacketConsumption();
+}
+
 void Dispatch::Submit(BaseQueue& queue) {
     ASSERT_NE(m_pEop, (void*)0);
     EXPECT_EQ(m_FamilyId, queue.GetFamilyId());
 
-    BuildIb();
+    BuildIb(true);
 
     queue.PlaceAndSubmitPacket(PM4IndirectBufPacket(&m_IndirectBuf));
 
@@ -116,7 +136,7 @@ int Dispatch::SyncWithStatus(unsigned int timeout) {
     return ((stat = hsaKmtWaitOnEvent(m_pEop, timeout)) != HSAKMT_STATUS_SUCCESS);
 }
 
-void Dispatch::BuildIb() {
+void Dispatch::BuildIb(bool dispatch) {
     HSAuint64 shiftedIsaAddr = m_IsaBuf.As<uint64_t>() >> 8;
     unsigned int arg0, arg1, arg2, arg3, arg4, arg5;
     SplitU64(reinterpret_cast<uint64_t>(m_pArg1), arg0, arg1);
@@ -268,7 +288,9 @@ void Dispatch::BuildIb() {
 
     //LOG() << std::dec << "Dim: " << m_DimX << " " << m_DimY << " " << m_DimZ << std::hex << "\n";
     //LOG() << std::dec << "Block: " << m_BlockX << " " << m_BlockY << " " << m_BlockZ << std::hex << "\n";
-    m_IndirectBuf.AddPacket(PM4DispatchDirectPacket(m_DimX, m_DimY, m_DimZ, DISPATCH_INIT_VALUE));
+    if (dispatch) {
+      m_IndirectBuf.AddPacket(PM4DispatchDirectPacket(m_DimX, m_DimY, m_DimZ, DISPATCH_INIT_VALUE));
+    }
 
     // EVENT_WRITE.partial_flush causes problems with preemptions in
     // GWS testing. Since this is specific to this PM4 command and

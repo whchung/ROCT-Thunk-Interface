@@ -39,6 +39,7 @@ class Dispatch {
     void SetBlock(unsigned int x, unsigned int y, unsigned int z);
 
     void Submit(BaseQueue& queue);
+    void SubmitWarmup(BaseQueue& queue);
 
     void Sync(unsigned int timeout = HSA_EVENTTIMEOUT_INFINITE);
 
@@ -51,7 +52,7 @@ class Dispatch {
     HsaEvent *GetHsaEvent() { return m_pEop; }
 
  private:
-    void BuildIb();
+    void BuildIb(bool dispatch);
 
  private:
     const HsaMemoryBuffer& m_IsaBuf;
