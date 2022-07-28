@@ -1387,26 +1387,19 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
 
     const int ITERATION = 10;
     HSAint64 latency_total_ns = 0;
-    HSAint64 latency_total_us = 0;
     HSAint64 begin_ns, end_ns, latency_ns;
-    HSAint64 begin_us, end_us, latency_us;
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
     begin_ns = ts[0].GPUClockCounter;
     for (int iter = 0; iter < ITERATION; ++iter) {
-      begin_us = GetSystemTickCountInMicroSec();
       dispatch.Submit(queue);
       dispatch.Sync();
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
       end_ns = ts[0].GPUClockCounter;
       latency_ns = end_ns - begin_ns;
       begin_ns = end_ns;
-      end_us = GetSystemTickCountInMicroSec();
-      latency_us = end_us - begin_us;
       latency_total_ns += latency_ns;
-      latency_total_us += latency_us;
     }
     LOG() << "Avg latency(ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
-    LOG() << "Avg latency(us): " << std::dec << (latency_total_us / ITERATION) << std::endl;
 
     EXPECT_SUCCESS(queue.Destroy());
 }
