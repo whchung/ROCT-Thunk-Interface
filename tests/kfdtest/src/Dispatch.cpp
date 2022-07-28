@@ -256,12 +256,12 @@ void Dispatch::BuildIb() {
                                                       ARRAY_SIZE(COMPUTE_PGM_RSRC3)));
     }
 
-    m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_RESOURCE_LIMITS, COMPUTE_RESOURCE_LIMITS,
-                                                  ARRAY_SIZE(COMPUTE_RESOURCE_LIMITS)));
-    m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_TMPRING_SIZE, COMPUTE_TMPRING_SIZE,
-                                                  ARRAY_SIZE(COMPUTE_TMPRING_SIZE)));
-    m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_RESTART_X, COMPUTE_RESTART_VALUES,
-                                                  ARRAY_SIZE(COMPUTE_RESTART_VALUES)));
+    // m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_RESOURCE_LIMITS, COMPUTE_RESOURCE_LIMITS,
+    //                                               ARRAY_SIZE(COMPUTE_RESOURCE_LIMITS)));
+    // m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_TMPRING_SIZE, COMPUTE_TMPRING_SIZE,
+    //                                               ARRAY_SIZE(COMPUTE_TMPRING_SIZE)));
+    // m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_RESTART_X, COMPUTE_RESTART_VALUES,
+    //                                               ARRAY_SIZE(COMPUTE_RESTART_VALUES)));
 
     m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_USER_DATA_0, COMPUTE_USER_DATA_VALUES,
                                                   ARRAY_SIZE(COMPUTE_USER_DATA_VALUES)));
