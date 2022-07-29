@@ -1406,8 +1406,8 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
       latency_total_ns += latency_ns;
       latency_total_cpu_ns += latency_cpu_ns;
     }
-    LOG() << "Avg latency GPU(ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
-    LOG() << "Avg latency CPU(ns): " << std::dec << (latency_total_cpu_ns / ITERATION) << std::endl;
+    LOG() << "Avg latency GPU clock (ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
+    LOG() << "Avg latency CPU clock (ns): " << std::dec << (latency_total_cpu_ns / ITERATION) << std::endl;
 
     EXPECT_SUCCESS(queue.Destroy());
 }
