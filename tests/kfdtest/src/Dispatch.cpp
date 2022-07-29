@@ -89,6 +89,7 @@ void Dispatch::SubmitWarmup(BaseQueue& queue) {
     ASSERT_NE(m_pEop, (void*)0);
     EXPECT_EQ(m_FamilyId, queue.GetFamilyId());
 
+    // Do NOT run the kernel in the warm up round
     BuildIb(false);
 
     queue.PlaceAndSubmitPacket(PM4IndirectBufPacket(&m_IndirectBuf));
@@ -286,9 +287,9 @@ void Dispatch::BuildIb(bool dispatch) {
     m_IndirectBuf.AddPacket(PM4SetShaderRegPacket(mmCOMPUTE_USER_DATA_0, COMPUTE_USER_DATA_VALUES,
                                                   ARRAY_SIZE(COMPUTE_USER_DATA_VALUES)));
 
-    //LOG() << std::dec << "Dim: " << m_DimX << " " << m_DimY << " " << m_DimZ << std::hex << "\n";
-    //LOG() << std::dec << "Block: " << m_BlockX << " " << m_BlockY << " " << m_BlockZ << std::hex << "\n";
     if (dispatch) {
+      //LOG() << std::dec << "Dim: " << m_DimX << " " << m_DimY << " " << m_DimZ << std::hex << "\n";
+      //LOG() << std::dec << "Block: " << m_BlockX << " " << m_BlockY << " " << m_BlockZ << std::hex << "\n";
       m_IndirectBuf.AddPacket(PM4DispatchDirectPacket(m_DimX, m_DimY, m_DimZ, DISPATCH_INIT_VALUE));
     }
 

@@ -303,12 +303,24 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120[] = {
 #if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
+// Original ISA:
+// s4-s5 : kernarg pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000:
 //0xC00A0002, 0x00000010, // s_load_dwordx4 s[0:3], s[4:5], 0x10                            // 000000000008:
 0x20060085,             // v_lshrrev_b32_e32 v3, 5, v0                                    // 000000000010:
 0x24080082,             // v_lshlrev_b32_e32 v4, 2, v0                                    // 000000000014:
 //0xBF8CC07F,             // s_waitcnt lgkmcnt(0)                                           // 000000000018:
 
+// Hacked ISA
+// s0-s1: matrix C pointer
+// s2-s3: matrix A pointer
+// s4-s5: matrix B pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
@@ -874,12 +886,25 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
 #if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
+// Original ISA:
+// s4-s5 : kernarg pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000:
 //0xC00A0002, 0x00000010, // s_load_dwordx4 s[0:3], s[4:5], 0x10                            // 000000000008:
 0x20060085,             // v_lshrrev_b32_e32 v3, 5, v0                                    // 000000000010:
 0x24080082,             // v_lshlrev_b32_e32 v4, 2, v0                                    // 000000000014:
 //0xBF8CC07F,             // s_waitcnt lgkmcnt(0)                                           // 000000000018:
 
+// Hacked ISA
+// s0-s1: matrix C pointer
+// s2-s3: matrix A pointer
+// s4-s5: matrix B pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
+0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
@@ -1428,12 +1453,25 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 #if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
+// Original ISA:
+// s4-s5 : kernarg pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000: 
 //0xC00A0002, 0x00000010, // s_load_dwordx4 s[0:3], s[4:5], 0x10                            // 000000000008: 
 0x20060085,             // v_lshrrev_b32_e32 v3, 5, v0                                    // 000000000010: 
 0x24080082,             // v_lshlrev_b32_e32 v4, 2, v0                                    // 000000000014: 
 //0xBF8CC07F,             // s_waitcnt lgkmcnt(0)                                           // 000000000018: 
 
+// Hacked ISA
+// s0-s1: matrix C pointer
+// s2-s3: matrix A pointer
+// s4-s5: matrix B pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
+0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
@@ -1988,12 +2026,25 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
 #if USE_EMPTY_KERNEL
 0xBF810000,              // s_endpgm                                                         // 000000000660:
 #else
+// Original ISA:
+// s4-s5 : kernarg pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
 //0xC00A0302, 0x00000000, // s_load_dwordx4 s[12:15], s[4:5], 0x0                           // 000000000000: 
 //0xC00A0002, 0x00000010, // s_load_dwordx4 s[0:3], s[4:5], 0x10                            // 000000000008: 
 0x20060085,             // v_lshrrev_b32_e32 v3, 5, v0                                    // 000000000010: 
 0x24080082,             // v_lshlrev_b32_e32 v4, 2, v0                                    // 000000000014: 
 //0xBF8CC07F,             // s_waitcnt lgkmcnt(0)                                           // 000000000018: 
 
+// Hacked ISA
+// s0-s1: matrix C pointer
+// s2-s3: matrix A pointer
+// s4-s5: matrix B pointer
+// s6 : workgroup_id_x
+// s7 : workgroup_id_y
+// s8 : workgroup_id_z
+0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
