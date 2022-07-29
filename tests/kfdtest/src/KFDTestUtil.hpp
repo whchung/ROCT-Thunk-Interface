@@ -36,7 +36,7 @@
 class BaseQueue;
 #define ARRAY_SIZE(_x) (sizeof(_x)/sizeof(_x[0]))
 #define ALIGN_UP(x, align) (((uint64_t)(x) + (align) - 1) & ~(uint64_t)((align)-1))
-#define CounterToNanoSec(x) ((x) * 1000 / (is_dgpu() ? 27 : 100))
+#define CounterToNanoSec(x) ((x) * 1000 / (is_dgpu() ? 25 : 100))
 
 void WaitUntilInput();
 HSAKMT_STATUS fscanf_dec(const char *file, uint32_t *num);
