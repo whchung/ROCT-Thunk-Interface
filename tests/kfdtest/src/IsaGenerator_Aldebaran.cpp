@@ -905,7 +905,6 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_384[] = {
 // s7 : workgroup_id_y
 // s8 : workgroup_id_z
 0xBE8C0002,             //     s_mov_b32 s12, s2
-0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
 0xBE8F0005,             //     s_mov_b32 s15, s5
@@ -1471,7 +1470,6 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1280_5120[] = {
 // s6 : workgroup_id_x
 // s7 : workgroup_id_y
 // s8 : workgroup_id_z
-0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
@@ -2044,7 +2042,6 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_5120_1280[] = {
 // s6 : workgroup_id_x
 // s7 : workgroup_id_y
 // s8 : workgroup_id_z
-0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
 0xBE8E0004,             //     s_mov_b32 s14, s4
