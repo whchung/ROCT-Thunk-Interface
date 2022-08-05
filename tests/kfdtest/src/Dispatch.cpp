@@ -35,7 +35,7 @@
 Dispatch::Dispatch(const HsaMemoryBuffer& isaBuf, const bool eventAutoReset)
     :m_IsaBuf(isaBuf), m_IndirectBuf(PACKETTYPE_PM4, PAGE_SIZE / sizeof(unsigned int), isaBuf.Node()),
     m_DimX(1), m_DimY(1), m_DimZ(1), m_BlockX(1), m_BlockY(1), m_BlockZ(1), m_pArg1(NULL), m_pArg2(NULL), m_pArg3(NULL), m_pEop(NULL), m_ScratchEn(false),
-    m_ComputeTmpringSize(0), m_scratch_base(0ll), m_SpiPriority(0) {
+    m_ComputeTmpringSize(0), m_scratch_base(0ll), m_SpiPriority(0), m_IsaOffset(0) {
     HsaEventDescriptor eventDesc;
     eventDesc.EventType = HSA_EVENTTYPE_SIGNAL;
     eventDesc.NodeId = isaBuf.Node();
@@ -83,6 +83,10 @@ void Dispatch::SetScratch(int numWaves, int waveSize, HSAuint64 scratch_base) {
 
 void Dispatch::SetSpiPriority(unsigned int priority) {
     m_SpiPriority = priority;
+}
+
+void Dispatch::SetIsaOffset(int IsaOffset) {
+    m_IsaOffset = IsaOffset;
 }
 
 void Dispatch::SubmitWarmup(BaseQueue& queue) {
@@ -138,7 +142,7 @@ int Dispatch::SyncWithStatus(unsigned int timeout) {
 }
 
 void Dispatch::BuildIb(bool dispatch) {
-    HSAuint64 shiftedIsaAddr = m_IsaBuf.As<uint64_t>() >> 8;
+    HSAuint64 shiftedIsaAddr = (m_IsaBuf.As<uint64_t>() + m_IsaOffset) >> 8;
     unsigned int arg0, arg1, arg2, arg3, arg4, arg5;
     SplitU64(reinterpret_cast<uint64_t>(m_pArg1), arg0, arg1);
     SplitU64(reinterpret_cast<uint64_t>(m_pArg2), arg2, arg3);

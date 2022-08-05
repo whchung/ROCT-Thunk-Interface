@@ -1362,7 +1362,7 @@ TEST_F(KFDQMTest, VectorGroupAdd) {
     TEST_END
 }
 
-void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z, int ITERATION) {
+void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z, int ITERATION, int IsaOffset) {
     PM4Queue queue[PM4_QUEUE_COUNT];
     HsaClockCounters *ts;
     HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 1, PAGE_SIZE), 0);
@@ -1378,6 +1378,7 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     dispatch.SetArgs(pMatrixCBuf, pMatrixABuf, pMatrixBBuf);
     dispatch.SetDim(X, Y, Z);
     dispatch.SetBlock(256, 1, 1);
+    dispatch.SetIsaOffset(IsaOffset);
 
     for (int iter = 0; iter < PM4_QUEUE_COUNT; ++iter)
       ASSERT_SUCCESS(queue[iter].Create(defaultGPUNode));
@@ -1570,7 +1571,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1, TEST_ITERATION);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1, TEST_ITERATION, 0x0);
 
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
@@ -1792,6 +1793,143 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
       EXPECT_LE((gpu_lsb >= cpu_lsb) ? (gpu_lsb - cpu_lsb) : (cpu_lsb - gpu_lsb), 1);
     }
 #endif
+
+    TEST_END
+}
+
+void KFDQMTest::SyncGEMMDispatchOnQueue(PM4Queue& queue, const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z, int ITERATION) {
+    HsaClockCounters *ts;
+    HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 1, PAGE_SIZE), 0);
+    ts = buf.As<HsaClockCounters*>();
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    if (node != -1)
+        defaultGPUNode = node;
+
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    Dispatch dispatch(isaBuffer);
+    dispatch.SetArgs(pMatrixCBuf, pMatrixABuf, pMatrixBBuf);
+    dispatch.SetDim(X, Y, Z);
+    dispatch.SetBlock(256, 1, 1);
+
+    //// warm-up
+    //HSAint64 latency_warmup_ns = 0;
+    //HSAint64 latency_warmup_cpu_ns = 0;
+    //HSAint64 begin_warmup_ns, end_warmup_ns;
+    //HSAint64 begin_warmup_cpu_ns, end_warmup_cpu_ns;
+    //hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+    //begin_warmup_ns = ts[0].GPUClockCounter;
+    //begin_warmup_cpu_ns = ts[0].CPUClockCounter;
+    //dispatch.SubmitWarmup(queue);
+    //dispatch.Sync();
+    //hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+    //end_warmup_ns = ts[0].GPUClockCounter;
+    //end_warmup_cpu_ns = ts[0].CPUClockCounter;
+    //latency_warmup_ns = end_warmup_ns - begin_warmup_ns;
+    //latency_warmup_cpu_ns = end_warmup_cpu_ns - begin_warmup_cpu_ns;
+    //LOG() << "Warmup latency GPU clock (ns): " << std::dec << CounterToNanoSec(latency_warmup_ns) << std::endl;
+    //LOG() << "Warmup latency CPU clock (ns): " << std::dec << latency_warmup_cpu_ns << std::endl;
+
+    HSAint64 latency_total_ns = 0;
+    HSAint64 latency_total_cpu_ns = 0;
+    HSAint64 begin_ns, end_ns, latency_ns;
+    HSAint64 begin_cpu_ns, end_cpu_ns, latency_cpu_ns;
+    hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+    begin_ns = ts[0].GPUClockCounter;
+    begin_cpu_ns = ts[0].CPUClockCounter;
+    for (int iter = 0; iter < ITERATION; ++iter) {
+      dispatch.Submit(queue);
+      dispatch.Sync();
+      hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+      end_ns = ts[0].GPUClockCounter;
+      end_cpu_ns = ts[0].CPUClockCounter;
+      latency_ns = end_ns - begin_ns;
+      latency_cpu_ns = end_cpu_ns - begin_cpu_ns;
+      begin_ns = end_ns;
+      begin_cpu_ns = end_cpu_ns;
+      latency_total_ns += latency_ns;
+      latency_total_cpu_ns += latency_cpu_ns;
+    }
+    LOG() << "Avg latency GPU clock (ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
+    LOG() << "Avg latency CPU clock (ns): " << std::dec << (latency_total_cpu_ns / ITERATION) << std::endl;
+}
+
+TEST_F(KFDQMTest, GEMMDispatch_B2B) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    PM4Queue queue;
+    ASSERT_SUCCESS(queue.Create(defaultGPUNode));
+
+    HsaMemoryBuffer isaBuffer0(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer isaBuffer1(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+
+    const int M0 = 16;
+    const int N0 = 1152;
+    const int K0 = 5120;
+    constexpr int sizeofA0 = M0 * K0 * 2;
+    constexpr int sizeofB0 = K0 * N0 * 2;
+    constexpr int sizeofC0 = M0 * N0 * 2;
+    HsaMemoryBuffer matrixA0Buffer(sizeofA0, defaultGPUNode, false);
+    HsaMemoryBuffer matrixB0Buffer(sizeofB0, defaultGPUNode, false);
+    HsaMemoryBuffer matrixC0Buffer(sizeofC0, defaultGPUNode, true/*zero*/);
+
+    const int M1 = 16;
+    const int N1 = 5120;
+    const int K1 = 384;
+    constexpr int sizeofA1 = M1 * K1 * 2;
+    constexpr int sizeofB1 = K1 * N1 * 2;
+    constexpr int sizeofC1 = M1 * N1 * 2;
+    HsaMemoryBuffer matrixA1Buffer(sizeofA1, defaultGPUNode, false);
+    HsaMemoryBuffer matrixB1Buffer(sizeofB1, defaultGPUNode, false);
+    HsaMemoryBuffer matrixC1Buffer(sizeofC1, defaultGPUNode, true/*zero*/);
+    
+    int *A0 = A_16_1152_5120;
+    int *B0 = B_16_1152_5120;
+    int *C0 = C_16_1152_5120;
+    // Initilize A/B with patterns.
+    srand(time(NULL));
+    for (unsigned int i = 0; i < sizeofA0 / sizeof(unsigned int); ++i) {
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixA0Buffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A0[i * 2] = value;
+      A0[i * 2 + 1] = value;
+    }
+    for (unsigned int i = 0; i < sizeofB0 / sizeof(unsigned int); ++i) {
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixB0Buffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B0[i * 2] = value;
+      B0[i * 2 + 1] = value;
+    }
+
+    int *A1 = A_16_5120_384;
+    int *B1 = B_16_5120_384;
+    int *C1 = C_16_5120_384;
+    // Initilize A/B with patterns.
+    srand(time(NULL));
+    for (unsigned int i = 0; i < sizeofA1 / sizeof(unsigned int); ++i) {
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixA1Buffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A1[i * 2] = value;
+      A1[i * 2 + 1] = value;
+    }
+    for (unsigned int i = 0; i < sizeofB1 / sizeof(unsigned int); ++i) {
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixB1Buffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B1[i * 2] = value;
+      B1[i * 2 + 1] = value;
+    }
+
+    m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer0);
+    m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer1);
+
+    SyncGEMMDispatchOnQueue(queue, isaBuffer0, matrixA0Buffer.As<void*>(), matrixB0Buffer.As<void*>(), matrixC0Buffer.As<void*>(), -1, 9 * 256, 1, 1, 1);
+    SyncGEMMDispatchOnQueue(queue, isaBuffer1, matrixA1Buffer.As<void*>(), matrixB1Buffer.As<void*>(), matrixC1Buffer.As<void*>(), -1, 40 * 256, 1, 1, 1);
+
+    EXPECT_SUCCESS(queue.Destroy());
 
     TEST_END
 }

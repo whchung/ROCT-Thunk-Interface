@@ -43,7 +43,8 @@ class KFDQMTest : public KFDBaseComponentTest {
 
     void SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pSrcBuf, void* pDstBuf, int node = -1);
     void SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node = -1, int X = 1, int Y = 1, int Z = 1, int BlockX = 1, int BlockY = 1, int BlockZ = 1);
-    void SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node = -1, int X = 1, int Y = 1, int Z = 1, int ITERATION = 1);
+    void SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node = -1, int X = 1, int Y = 1, int Z = 1, int ITERATION = 1, int IsaOffset = 0);
+    void SyncGEMMDispatchOnQueue(PM4Queue& queue, const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node = -1, int X = 1, int Y = 1, int Z = 1, int ITERATION = 1);
     HSAint64 TimeConsumedwithCUMask(int node, uint32_t *mask, uint32_t mask_count);
     HSAint64 GetAverageTimeConsumedwithCUMask(int node, uint32_t *mask, uint32_t mask_count, int iterations);
  protected:  // Members

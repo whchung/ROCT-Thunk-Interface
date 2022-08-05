@@ -49,6 +49,8 @@ class Dispatch {
 
     void SetSpiPriority(unsigned int priority);
 
+    void SetIsaOffset(int IsaOffset);
+
     HsaEvent *GetHsaEvent() { return m_pEop; }
 
  private:
@@ -79,6 +81,8 @@ class Dispatch {
     HSAuint64  m_scratch_base;
     unsigned int m_SpiPriority;
     unsigned int  m_FamilyId;
+
+    int m_IsaOffset;
 };
 
 #endif  // __KFD_DISPATCH__H__
