@@ -304,4 +304,5 @@ void Dispatch::BuildIb(bool dispatch) {
     //uint32_t *nop = m_IndirectBuf.AddPacket(PM4NopPacket(2)); // NOP packet with one dword payload for the release-mem fence
     //m_IndirectBuf.AddPacket(PM4ReleaseMemoryPacket(m_FamilyId, true, (uint64_t)&nop[1], 0xdeadbeef));
     //m_IndirectBuf.AddPacket(PM4WaitRegMemPacket(true, (uint64_t)&nop[1], 0xdeadbeef, 4));
+    m_IndirectBuf.AddPacket(PM4PartialFlushPacket());
 }
