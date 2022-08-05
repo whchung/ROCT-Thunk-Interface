@@ -47,6 +47,8 @@ class IsaGenerator_Aldbrn : public IsaGenerator {
     virtual void GetGEMMIsa_16_1280_5120(HsaMemoryBuffer& rBuf);
     virtual void GetGEMMIsa_16_5120_1280(HsaMemoryBuffer& rBuf);
 
+    virtual void GetGEMMIsa_B2B(HsaMemoryBuffer& buf);
+
  protected:
     virtual const std::string& GetAsicName();
 
@@ -70,6 +72,8 @@ class IsaGenerator_Aldbrn : public IsaGenerator {
     static const uint32_t GEMM_ISA_16_5120_384[];
     static const uint32_t GEMM_ISA_16_1280_5120[];
     static const uint32_t GEMM_ISA_16_5120_1280[];
+
+    static const uint32_t GEMM_ISA_B2B[];
 };
 
 #endif  // _ISAGENERATOR_ALDEBARAN_H_
