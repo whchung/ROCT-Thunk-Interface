@@ -1576,6 +1576,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
+    LOG() << "Verifying C\n";
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
       //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
       unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
@@ -1645,6 +1646,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
+    LOG() << "Verifying C\n";
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
       //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
       unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
@@ -1714,6 +1716,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
+    LOG() << "Verifying C\n";
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
       //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
       unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
@@ -1783,6 +1786,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
 
+    LOG() << "Verifying C\n";
     for (unsigned int i = 0; i < sizeofC / sizeof(unsigned int); ++i) {
       //std::cout <<  std::hex << matrixCBuffer.As<unsigned int*>()[i] << " ";
       unsigned int gpu_msb = matrixCBuffer.As<unsigned int*>()[i] >> 16;
