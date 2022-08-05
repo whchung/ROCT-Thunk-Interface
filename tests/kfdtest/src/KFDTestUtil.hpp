@@ -27,6 +27,7 @@
 #define USE_EMPTY_KERNEL (0)
 #define USE_RAND_INIT (1)
 #define PM4_QUEUE_COUNT (1)
+#define TEST_ITERATION (PM4_QUEUE_COUNT * 4)
 
 #include <gtest/gtest.h>
 #include <vector>

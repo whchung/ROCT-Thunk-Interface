@@ -1362,7 +1362,7 @@ TEST_F(KFDQMTest, VectorGroupAdd) {
     TEST_END
 }
 
-void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z) {
+void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z, int ITERATION) {
     PM4Queue queue[PM4_QUEUE_COUNT];
     HsaClockCounters *ts;
     HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 1, PAGE_SIZE), 0);
@@ -1402,7 +1402,6 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     LOG() << "Warmup latency GPU clock (ns): " << std::dec << CounterToNanoSec(latency_warmup_ns) << std::endl;
     LOG() << "Warmup latency CPU clock (ns): " << std::dec << latency_warmup_cpu_ns << std::endl;
 
-    const int ITERATION = PM4_QUEUE_COUNT * 4;
     HSAint64 latency_total_ns = 0;
     HSAint64 latency_total_cpu_ns = 0;
     HSAint64 begin_ns, end_ns, latency_ns;
@@ -1571,7 +1570,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
 
     m_pIsaGen->GetGEMMIsa_16_1152_5120(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1, TEST_ITERATION);
 
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
@@ -1640,7 +1639,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_384) {
 
     m_pIsaGen->GetGEMMIsa_16_5120_384(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 1);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), /*node=*/-1, 40 * 256, 1, 1, TEST_ITERATION);
 
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
@@ -1709,7 +1708,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1280_5120) {
 
     m_pIsaGen->GetGEMMIsa_16_1280_5120(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 1);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 10 * 256, 1, 1, TEST_ITERATION);
 
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
@@ -1778,7 +1777,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
 
     m_pIsaGen->GetGEMMIsa_16_5120_1280(isaBuffer);
 
-    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 1);
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 40 * 256, 1, 1, TEST_ITERATION);
 
 #if !USE_EMPTY_KERNEL
     CPUGEMM(A, B, C, M, N, K);
