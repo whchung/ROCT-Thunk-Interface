@@ -1383,10 +1383,24 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
       ASSERT_SUCCESS(queue[iter].Create(defaultGPUNode));
 
     // warm-up
+    HSAint64 latency_warmup_ns = 0;
+    HSAint64 latency_warmup_cpu_ns = 0;
+    HSAint64 begin_warmup_ns, end_warmup_ns;
+    HSAint64 begin_warmup_cpu_ns, end_warmup_cpu_ns;
+    hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+    begin_warmup_ns = ts[0].GPUClockCounter;
+    begin_warmup_cpu_ns = ts[0].CPUClockCounter;
     for (int iter = 0; iter < PM4_QUEUE_COUNT; ++iter) {
       dispatch.SubmitWarmup(queue[iter]);
       dispatch.Sync();
     }
+    hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
+    end_warmup_ns = ts[0].GPUClockCounter;
+    end_warmup_cpu_ns = ts[0].CPUClockCounter;
+    latency_warmup_ns = end_warmup_ns - begin_warmup_ns;
+    latency_warmup_cpu_ns = end_warmup_cpu_ns - begin_warmup_cpu_ns;
+    LOG() << "Warmup latency GPU clock (ns): " << std::dec << CounterToNanoSec(latency_warmup_ns) << std::endl;
+    LOG() << "Warmup latency CPU clock (ns): " << std::dec << latency_warmup_cpu_ns << std::endl;
 
     const int ITERATION = PM4_QUEUE_COUNT * 4;
     HSAint64 latency_total_ns = 0;
