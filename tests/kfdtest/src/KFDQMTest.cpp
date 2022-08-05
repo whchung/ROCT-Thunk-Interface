@@ -1363,7 +1363,7 @@ TEST_F(KFDQMTest, VectorGroupAdd) {
 }
 
 void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z) {
-    PM4Queue queue;
+    PM4Queue queue[PM4_QUEUE_COUNT];
     HsaClockCounters *ts;
     HsaMemoryBuffer buf(ALIGN_UP(sizeof(HsaClockCounters) * 1, PAGE_SIZE), 0);
     ts = buf.As<HsaClockCounters*>();
@@ -1379,13 +1379,16 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     dispatch.SetDim(X, Y, Z);
     dispatch.SetBlock(256, 1, 1);
 
-    ASSERT_SUCCESS(queue.Create(defaultGPUNode));
+    for (int iter = 0; iter < PM4_QUEUE_COUNT; ++iter)
+      ASSERT_SUCCESS(queue[iter].Create(defaultGPUNode));
 
     // warm-up
-    dispatch.SubmitWarmup(queue);
-    dispatch.Sync();
+    for (int iter = 0; iter < PM4_QUEUE_COUNT; ++iter) {
+      dispatch.SubmitWarmup(queue[iter]);
+      dispatch.Sync();
+    }
 
-    const int ITERATION = 10;
+    const int ITERATION = PM4_QUEUE_COUNT * 4;
     HSAint64 latency_total_ns = 0;
     HSAint64 latency_total_cpu_ns = 0;
     HSAint64 begin_ns, end_ns, latency_ns;
@@ -1393,9 +1396,11 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
     begin_ns = ts[0].GPUClockCounter;
     begin_cpu_ns = ts[0].CPUClockCounter;
-    for (int iter = 0; iter < ITERATION; ++iter) {
-      dispatch.Submit(queue);
-      dispatch.Sync();
+    for (int iter = 0; iter < ITERATION / PM4_QUEUE_COUNT; ++iter) {
+      for (int j = 0; j < PM4_QUEUE_COUNT; ++j) {
+        dispatch.Submit(queue[j]);
+        dispatch.Sync();
+      }
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
       end_ns = ts[0].GPUClockCounter;
       end_cpu_ns = ts[0].CPUClockCounter;
@@ -1409,7 +1414,8 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     LOG() << "Avg latency GPU clock (ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
     LOG() << "Avg latency CPU clock (ns): " << std::dec << (latency_total_cpu_ns / ITERATION) << std::endl;
 
-    EXPECT_SUCCESS(queue.Destroy());
+    for (int iter = 0; iter < PM4_QUEUE_COUNT; ++iter)
+      EXPECT_SUCCESS(queue[iter].Destroy());
 }
 
 unsigned int2hfloat(int x)
