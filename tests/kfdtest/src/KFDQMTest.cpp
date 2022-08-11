@@ -1803,7 +1803,7 @@ TEST_F(KFDQMTest, GEMMDispatch_16_5120_1280) {
 
 TEST_F(KFDQMTest, GEMMDispatch_B2B) {
 #define NUM_GEMM_TEST (4)
-#define ITERATION (4)
+#define ITERATION (1)
     TEST_START(TESTPROFILE_RUNALL);
 
     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
@@ -1868,10 +1868,6 @@ TEST_F(KFDQMTest, GEMMDispatch_B2B) {
     begin_warmup_ns = ts[0].GPUClockCounter;
     begin_warmup_cpu_ns = ts[0].CPUClockCounter;
 
-    dispatch.SetArgs(matrixCBuffer[3]->As<void*>(), matrixABuffer[3]->As<void*>(), matrixBBuffer[3]->As<void*>());
-    dispatch.SetDim(40 * 256, 1, 1);
-    dispatch.SetBlock(256, 1, 1);
-    dispatch.SetIsaOffset(0x1500);
     dispatch.SubmitWarmup(queue);
     dispatch.Sync();
 
