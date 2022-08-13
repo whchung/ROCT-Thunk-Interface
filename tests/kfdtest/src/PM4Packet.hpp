@@ -245,4 +245,19 @@ class PM4WaitRegMemPacket : public PM4Packet {
     PM4MEC_WAIT_REG_MEM m_packetData;
 };
 
+class PM4DmaDataPacket : public PM4Packet {
+ public:
+  PM4DmaDataPacket(void) {}
+  PM4DmaDataPacket(uint64_t address, uint32_t byteCount) {InitPacket(address, byteCount);}
+  virtual ~PM4DmaDataPacket(void) {}
+
+  virtual unsigned int SizeInBytes() const;
+  virtual const void *GetPacket() const { return &m_packetData; }
+
+  void InitPacket(uint64_t address, uint32_t byteCount);
+
+ private:
+    PM4DMA_DATA m_packetData;
+};
+
 #endif  // __KFD_PM4_PACKET__H__

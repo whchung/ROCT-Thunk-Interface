@@ -405,3 +405,22 @@ void PM4WaitRegMemPacket::InitPacket(unsigned int function,
 unsigned int PM4WaitRegMemPacket::SizeInBytes() const {
     return sizeof(m_packetData);
 }
+
+void PM4DmaDataPacket::InitPacket(uint64_t address, uint32_t byteCount) {
+    memset(&m_packetData, 0, SizeInBytes());
+    InitPM4Header(m_packetData.header, IT_DMA_DATA);
+
+    m_packetData.bitfields2.src_cache_policy = 0; // lru
+    m_packetData.bitfields2.dst_sel = 2;          // dst_nowhere
+    m_packetData.bitfields2.src_sel = 3;          // src_addr_using_l2
+
+    m_packetData.src_addr_lo_or_data = address;
+    m_packetData.src_addr_hi = address >> 32;
+
+    m_packetData.bitfields7.byte_count = byteCount;
+    m_packetData.bitfields7.saic = 0;             // increment
+}
+
+unsigned int PM4DmaDataPacket::SizeInBytes() const {
+    return sizeof(m_packetData);
+}

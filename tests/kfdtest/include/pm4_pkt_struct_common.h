@@ -362,5 +362,57 @@ enum MEC_RELEASE_MEM_int_sel_enum { int_sel_mec_release_mem_NONE_0 = 0, int_sel_
 enum MEC_RELEASE_MEM_data_sel_enum { data_sel_mec_release_mem_NONE_0 = 0, data_sel_mec_release_mem_SEND_32_BIT_LOW_1 = 1, data_sel_mec_release_mem_SEND_64_BIT_DATA_2 = 2, data_sel_mec_release_mem_SEND_GPU_CLOCK_COUNTER_3 = 3, data_sel_mec_release_mem_SEND_CP_PERFCOUNTER_HI_LO_4 = 4, data_sel_mec_release_mem_STORE_GDS_DATA_TO_MEMORY_5 = 5 };
 
 
+//--------------------DMA_DATA--------------------
+
+typedef struct _PM4_DMA_DATA
+{
+    union
+    {
+        PM4_TYPE_3_HEADER   header;            ///header
+        unsigned int        ordinal1;
+    };
+
+    union
+    {
+        struct
+        {
+            unsigned int reserved1:13;
+            unsigned int src_cache_policy:2;
+            unsigned int reserved2:5;
+            unsigned int dst_sel:2;
+            unsigned int reserved3:3;
+            unsigned int dst_cache_policy:2;
+            unsigned int reserved4:2;
+            unsigned int src_sel:2;
+            unsigned int reserved5:1;
+        } bitfields2;
+        unsigned int ordinal2;
+    };
+
+    unsigned int src_addr_lo_or_data;
+
+    unsigned int src_addr_hi;
+
+    unsigned int dst_addr_lo;
+
+    unsigned int dst_addr_hi;
+
+    union
+    {
+        struct
+        {
+            unsigned int byte_count:26;
+            unsigned int sas:1;
+            unsigned int das:1;
+            unsigned int saic:1;
+            unsigned int daic:1;
+            unsigned int raw_wait:1;
+            unsigned int dis_wc:1;
+        } bitfields7;
+        unsigned int ordinal7;
+    };
+
+}  PM4DMA_DATA, *PPM4DATA_DATA;
+
 #endif
 
