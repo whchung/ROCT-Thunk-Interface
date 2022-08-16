@@ -53,6 +53,8 @@ class IsaGenerator {
     virtual void GetGEMMIsa_16_1280_5120(HsaMemoryBuffer& rBuf) {}
     virtual void GetGEMMIsa_16_5120_1280(HsaMemoryBuffer& rBuf) {}
 
+    virtual void GetGEMMIsa_16_1152_5120_timing(HsaMemoryBuffer& buf) {}
+
     virtual void GetGEMMIsa_B2B(HsaMemoryBuffer& buf) {}
 
     void CompileShader(const char* shaderCode, const char* shaderName, HsaMemoryBuffer& rBuf);

@@ -1596,6 +1596,59 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120) {
     TEST_END
 }
  
+TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120_timing) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    // M=16
+    // N=1152
+    // K=5120
+    // sizeof(A) = M * K * sizeof(half)
+    // sizeof(B) = K * N * sizeof(half)
+    // sizeof(C) = M * N * sizeof(half)
+    const int M = 16;
+    const int N = 1152;
+    const int K = 5120;
+    constexpr int sizeofA = M * K * 2;
+    constexpr int sizeofB = K * N * 2;
+    constexpr int sizeofC = M * N * 2;
+    HsaMemoryBuffer matrixABuffer(sizeofA, defaultGPUNode, false);
+    HsaMemoryBuffer matrixBBuffer(sizeofB, defaultGPUNode, false);
+    HsaMemoryBuffer matrixCBuffer(sizeofC, defaultGPUNode, true/*zero*/);
+
+    //matrixABuffer.Fill(0x40004000); // 2.0 (half) / 2.0 (half)
+    //matrixBBuffer.Fill(0x3C003C00); // 1.0 (half) / 1.0 (half)
+
+    int *A = A_16_1152_5120;
+    int *B = B_16_1152_5120;
+    int *C = C_16_1152_5120;
+    // Initilize A/B with patterns.
+    srand(time(NULL));
+    for (unsigned int i = 0; i < sizeofA / sizeof(unsigned int); ++i) {
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixABuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      A[i * 2] = value;
+      A[i * 2 + 1] = value;
+    }
+    for (unsigned int i = 0; i < sizeofB / sizeof(unsigned int); ++i) {
+      int value = (USE_RAND_INIT) ? (-5 + rand() % 11) : (-5 + i % 11);
+      matrixBBuffer.As<unsigned int*>()[i] = ConvertI32ToPackedF16x2(value);
+      B[i * 2] = value;
+      B[i * 2 + 1] = value;
+    }
+
+    m_pIsaGen->GetGEMMIsa_16_1152_5120_timing(isaBuffer);
+
+    SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1, TEST_ITERATION, 0x0);
+
+    LOG() << "Latency in C[]: " << matrixCBuffer.As<unsigned int*>()[0] << "\n";
+
+    TEST_END
+}
+
 static int A_16_5120_384[16 * 384];
 static int B_16_5120_384[384 * 5120];
 static int C_16_5120_384[16 * 5120];
