@@ -94,8 +94,34 @@ const uint32_t IsaGenerator_Aldbrn::ATOMIC_ADD_ISA[] = {
 const uint32_t IsaGenerator_Aldbrn::CUSTOM_SGPR_ISA[] = {
     0x7e040202,               // v_mov_b32 v2, s2
     0x7e060203,               // v_mov_b32 v3, s3
-    0x7e08020f,               // v_mov_b32 v4, s15. s15 would be 0xCAFEBABE.
+
+    //0x7e08020f,               // v_mov_b32 v4, s15. s15 would be 0xCAFEBABE.
+
+    0xC0940000, 0x00000000,   // s_memrealtime s[0:1]
+    //0xC0900000, 0x00000000,   // s_memtime s[0:1]
+    0xbf8c0000,               // s_waitcnt 0
+    0x7e080200,               // v_mov_b32 v4, s0
+    0x7e0A0201,               // v_mov_b32 v5, s1
+
     0xdc730000, 0x007f0402,   // flat_store_dword v[2:3], v4 slc glc
+    0x68040484,               // v_add_u32_32 v2, 4, v2
+    0xdc730000, 0x007f0502,   // flat_store_dword v[2:3], v5 slc glc
+    0xbf8c0000,               // s_waitcnt 0
+
+    0xBF8E003F,               // s_sleep 127
+
+    0xC0940000, 0x00000040,   // s_memrealtime s[1:2]
+    //0xC0900000, 0x00000000,   // s_memtime s[0:1]
+    0xbf8c0000,               // s_waitcnt 0
+    0x7e080200,               // v_mov_b32 v4, s0
+    0x7e0A0201,               // v_mov_b32 v5, s1
+
+    0x68040484,               // v_add_u32_32 v2, 4, v2
+    0xdc730000, 0x007f0402,   // flat_store_dword v[2:3], v4 slc glc
+    0x68040484,               // v_add_u32_32 v2, 4, v2
+    0xdc730000, 0x007f0502,   // flat_store_dword v[2:3], v5 slc glc
+    0xbf8c0000,               // s_waitcnt 0
+
     0xbf810000                // s_endpgm
 };
 

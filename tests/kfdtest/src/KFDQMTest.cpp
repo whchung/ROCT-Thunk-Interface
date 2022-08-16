@@ -1168,28 +1168,33 @@ void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pSrcBuf, vo
 //     TEST_END
 // }
 
-// TEST_F(KFDQMTest, CustomSGPRDispatch) {
-//     TEST_START(TESTPROFILE_RUNALL);
-// 
-//     int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
-//     ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
-// 
-//     HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
-//     HsaMemoryBuffer srcBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-//     HsaMemoryBuffer destBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/);
-// 
-//     srcBuffer.Fill(0x0EADBEEF);
-//     destBuffer.Fill(0x0A3D0A3D);
-// 
-//     m_pIsaGen->GetCustomSGPRIsa(isaBuffer);
-// 
-//     SyncDispatch(isaBuffer, srcBuffer.As<void*>(), destBuffer.As<void*>());
-// 
-//     EXPECT_EQ(destBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
-//     EXPECT_EQ(destBuffer.As<unsigned int*>()[1], 0x0A3D0A3D);
-// 
-//     TEST_END
-// }
+TEST_F(KFDQMTest, CustomSGPRDispatch) {
+    TEST_START(TESTPROFILE_RUNALL);
+
+    int defaultGPUNode = m_NodeInfo.HsaDefaultGPUNode();
+    ASSERT_GE(defaultGPUNode, 0) << "failed to get default GPU Node";
+
+    HsaMemoryBuffer isaBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/, false/*local*/, true/*exec*/);
+    HsaMemoryBuffer srcBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+    HsaMemoryBuffer destBuffer(PAGE_SIZE, defaultGPUNode, true/*zero*/);
+
+    //srcBuffer.Fill(0x0EADBEEF);
+    //destBuffer.Fill(0x0A3D0A3D);
+
+    m_pIsaGen->GetCustomSGPRIsa(isaBuffer);
+
+    SyncDispatch(isaBuffer, srcBuffer.As<void*>(), destBuffer.As<void*>());
+
+    //LOG() << destBuffer.As<unsigned int*>()[1] << " " << destBuffer.As<unsigned int*>()[0] << " - "
+	//  << destBuffer.As<unsigned int*>()[3] << " " << destBuffer.As<unsigned int*>()[2] << "\n";
+    LOG() << "Latency: " << std::dec << ((destBuffer.As<unsigned int*>()[2] - destBuffer.As<unsigned int*>()[0]) * 40 / 1000) << " us\n";
+
+
+    //EXPECT_EQ(destBuffer.As<unsigned int*>()[0], 0xCAFEBABE);
+    //EXPECT_EQ(destBuffer.As<unsigned int*>()[1], 0x0A3D0A3D);
+
+    TEST_END
+}
 
 void KFDQMTest::SyncDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrixABuf, void* pMatrixBBuf, void* pMatrixCBuf, int node, int X, int Y, int Z, int BlockX, int BlockY, int BlockZ) {
     PM4Queue queue;
