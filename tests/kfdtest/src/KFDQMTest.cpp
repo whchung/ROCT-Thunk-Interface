@@ -1412,6 +1412,8 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
     HSAint64 latency_total_cpu_ns = 0;
     HSAint64 begin_ns, end_ns, latency_ns;
     HSAint64 begin_cpu_ns, end_cpu_ns, latency_cpu_ns;
+    HSAint64 begin_cpu_us = GetSystemTickCountInMicroSec();
+    HSAint64 end_cpu_us, latency_cpu_us, latency_total_cpu_us = 0;
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
     begin_ns = ts[0].GPUClockCounter;
     begin_cpu_ns = ts[0].CPUClockCounter;
@@ -1420,6 +1422,7 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
         dispatch.Submit(queue[j]);
         dispatch.Sync();
       }
+      end_cpu_us = GetSystemTickCountInMicroSec();
       hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
       end_ns = ts[0].GPUClockCounter;
       end_cpu_ns = ts[0].CPUClockCounter;
@@ -1429,9 +1432,14 @@ void KFDQMTest::SyncGEMMDispatch(const HsaMemoryBuffer& isaBuffer, void* pMatrix
       begin_cpu_ns = end_cpu_ns;
       latency_total_ns += latency_ns;
       latency_total_cpu_ns += latency_cpu_ns;
+
+      latency_cpu_us = end_cpu_us - begin_cpu_us;
+      begin_cpu_us = end_cpu_us;
+      latency_total_cpu_us += latency_cpu_us;
     }
     LOG() << "Avg latency GPU clock (ns): " << std::dec << (CounterToNanoSec(latency_total_ns) / ITERATION) << std::endl;
     LOG() << "Avg latency CPU clock (ns): " << std::dec << (latency_total_cpu_ns / ITERATION) << std::endl;
+    LOG() << "Avg latency CPU clock (us): " << std::dec << (latency_total_cpu_us / ITERATION) << std::endl;
 
     for (int iter = 0; iter < PM4_QUEUE_COUNT; ++iter)
       EXPECT_SUCCESS(queue[iter].Destroy());
@@ -1644,7 +1652,9 @@ TEST_F(KFDQMTest, GEMMDispatch_16_1152_5120_timing) {
 
     SyncGEMMDispatch(isaBuffer, matrixABuffer.As<void*>(), matrixBBuffer.As<void*>(), matrixCBuffer.As<void*>(), -1, 9 * 256, 1, 1, TEST_ITERATION, 0x0);
 
-    LOG() << "Latency in C[]: " << matrixCBuffer.As<unsigned int*>()[0] << "\n";
+    for (int i = 0; i < sizeofC / sizeof(unsigned int); i += 2) {
+      LOG() << "0x" << std::hex << std::setw(8) << std::setfill('0') << matrixCBuffer.As<unsigned int*>()[i+1] << std::setw(8) << std::setfill('0') << matrixCBuffer.As<unsigned int*>()[i] << "\n";
+    }
 
     TEST_END
 }
@@ -1943,6 +1953,9 @@ TEST_F(KFDQMTest, GEMMDispatch_B2B) {
     HSAint64 latency_total_cpu_ns = 0;
     HSAint64 begin_ns, end_ns, latency_ns;
     HSAint64 begin_cpu_ns, end_cpu_ns, latency_cpu_ns;
+    HSAint64 begin_cpu_us, end_cpu_us, latency_cpu_us;
+    HSAint64 latency_total_cpu_us = 0;
+    begin_cpu_us = GetSystemTickCountInMicroSec();
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
     begin_ns = ts[0].GPUClockCounter;
     begin_cpu_ns = ts[0].CPUClockCounter;
@@ -1981,14 +1994,17 @@ TEST_F(KFDQMTest, GEMMDispatch_B2B) {
       dispatch.Sync();
     }
 
+    end_cpu_us = GetSystemTickCountInMicroSec();
     hsaKmtGetClockCounters(defaultGPUNode, &ts[0]);
     end_ns = ts[0].GPUClockCounter;
     end_cpu_ns = ts[0].CPUClockCounter;
     latency_ns = end_ns - begin_ns;
     latency_cpu_ns = end_cpu_ns - begin_cpu_ns;
+    latency_cpu_us = end_cpu_us - begin_cpu_us;
     
     LOG() << "Avg latency GPU clock (ns): " << std::dec << (CounterToNanoSec(latency_ns) / ITERATION) << std::endl;
     LOG() << "Avg latency CPU clock (ns): " << std::dec << (latency_cpu_ns / ITERATION) << std::endl;
+    LOG() << "Avg latency CPU clock (us): " << std::dec << (latency_cpu_us / ITERATION) << std::endl;
 
     for (int iter = 0; iter < NUM_GEMM_TEST; ++iter) {
       CPUGEMM(A[iter], B[iter], C[iter], M[iter], N[iter], K[iter]);

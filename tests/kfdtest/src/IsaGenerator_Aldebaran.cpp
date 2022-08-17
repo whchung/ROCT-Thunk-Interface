@@ -349,8 +349,10 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120_TIMING[] = {
 // s8 : workgroup_id_z
 0xBE8C0002,             //     s_mov_b32 s12, s2
 0xBE8D0003,             //     s_mov_b32 s13, s3
-0xBE8E0004,             //     s_mov_b32 s14, s4
-0xBE8F0005,             //     s_mov_b32 s15, s5
+//0xBE8E0004,             //     s_mov_b32 s14, s4
+//0xBE8F0005,             //     s_mov_b32 s15, s5
+0xC0940780, 0x00000000,   // s_memrealtime s[30:31]
+//0xC0900780, 0x00000000,   // s_memtime s[30:31]
 0xBF800000,             // s_nop 0
 
 0x8E038407,             // s_lshl_b32 s3, s7, 4                                           // 00000000001C:
@@ -367,9 +369,9 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120_TIMING[] = {
 0x24040281,             // v_lshlrev_b32_e32 v2, 1, v1                                    // 000000000058:
 0xBE8700FF, 0x00020000, // s_mov_b32 s7, 0x20000                                          // 00000000005C:
 0x28080504,             // v_or_b32_e32 v4, v4, v2                                        // 000000000064:
-0xBE88000E,             // s_mov_b32 s8, s14                                              // 000000000068:
+0xBE880004,             // s_mov_b32 s8, s4                                              // 000000000068:
 0xBE8A00FF, 0x01680000, // s_mov_b32 s10, 0x1680000                                       // 00000000006C:
-0xBE89000F,             // s_mov_b32 s9, s15                                              // 000000000074:
+0xBE890005,             // s_mov_b32 s9, s5                                              // 000000000074:
 0xBE8B0007,             // s_mov_b32 s11, s7                                              // 000000000078:
 0x681A24FF, 0x00009000, // v_add_u32_e32 v13, 0x9000, v18                                 // 00000000007C:
 0x24280881,             // v_lshlrev_b32_e32 v20, 1, v4                                   // 000000000084:
@@ -584,7 +586,12 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120_TIMING[] = {
 0xBE8300FF, 0x00020000, // s_mov_b32 s3, 0x20000                                          // 00000000058C:
 0xBE8200FF, 0x00012000, // s_mov_b32 s2, 0x12000                                          // 000000000594:
 0xD1FE0004, 0x02061103, // v_add_lshl_u32 v4, v3, v8, 1                                   // 00000000059C:
+//0xE0741000, 0x80000004, // buffer_store_dwordx2 v[0:1], v4, s[0:3], 0 offen               // 0000000005A4:
+
+0x7e00021E,             // v_mov_b32 v0, s30
+0x7e02021F,             // v_mov_b32 v1, s31
 0xE0741000, 0x80000004, // buffer_store_dwordx2 v[0:1], v4, s[0:3], 0 offen               // 0000000005A4:
+
 0xBF8CC07F,             // s_waitcnt lgkmcnt(0)                                           // 0000000005AC:
 0xBF8A0000,             // s_barrier                                                      // 0000000005B0:
 0xDA1A0000, 0x0000000C, // ds_write_b32 v12, a0                                           // 0000000005B4:
@@ -601,6 +608,16 @@ const uint32_t IsaGenerator_Aldbrn::GEMM_ISA_16_1152_5120_TIMING[] = {
 0x7E061503,             // v_cvt_f16_f32_e32 v3, v3                                       // 0000000005F4:
 0xD2A00000, 0x00020B00, // v_pack_b32_f16 v0, v0, v5                                      // 0000000005F8:
 0xD2A00001, 0x00020702, // v_pack_b32_f16 v1, v2, v3                                      // 000000000600:
+//0xE0741080, 0x80000004, // buffer_store_dwordx2 v[0:1], v4, s[0:3], 0 offen offset:128    // 000000000608:
+
+0xC0940700, 0x00000000, // s_memrealtime s[28:29]
+0x7e00021C,             // v_mov_b32 v0, s28
+0x7e02021D,             // v_mov_b32 v1, s29
+
+//0x809F1E1C,             // s_sub_u32 s31, s28, s30
+//0x7e00021F,             // v_mov_b32 v0, s31
+//0x7e02021F,             // v_mov_b32 v1, s31
+
 0xE0741080, 0x80000004, // buffer_store_dwordx2 v[0:1], v4, s[0:3], 0 offen offset:128    // 000000000608:
 0xBF810000              // s_endpgm                                                       // 000000000610:
 #endif
